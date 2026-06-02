@@ -1,0 +1,161 @@
+﻿Diagnose log at 2026-06-02T15:50:31Z
+
+AppPath: C:\Program Files\Git\mingw64\bin\git-credential-manager.exe
+InstallDir: C:\Program Files\Git\mingw64\bin\
+Version: 2.7.3+5fa7116896c82164996a609accd1c5ad90fe730a
+
+------------
+Diagnostic: Environment
+Skipped: False
+Success: True
+Exception: None
+Log:
+OSType: Windows
+OSVersion: 10.0 (build 26200)
+Reading environment variables... OK
+ Variables:
+SystemDrive=C:
+ProgramFiles(x86)=C:\Program Files (x86)
+MSYSTEM=MINGW64
+ProgramW6432=C:\Program Files
+PROCESSOR_IDENTIFIER=AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD
+TMP=C:\Users\diego\AppData\Local\Temp
+PROCESSOR_ARCHITECTURE=AMD64
+VSCODE_GIT_ASKPASS_MAIN=c:\Users\diego\AppData\Roaming\Code\User\globalStorage\vscode.git\askpass\493597c785d4c5cb\askpass-main.js
+Path=C:/Program Files/Git/mingw64/libexec/git-core;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\diego\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Users\diego\AppData\Local\Microsoft\WindowsApps;C:\Users\diego\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\diego\AppData\Local\Programs\Ollama;C:\Users\diego\AppData\Roaming\npm
+USERPROFILE=C:\Users\diego
+VSCODE_GIT_IPC_HANDLE=\\.\pipe\vscode-git-3da7230e93-sock
+PROCESSOR_REVISION=4401
+TEMP=C:\Users\diego\AppData\Local\Temp
+FPS_BROWSER_APP_PROFILE_STRING=Internet Explorer
+FPS_BROWSER_USER_PROFILE_STRING=Default
+LOGONSERVER=\\LAPTOP-AEC67A0Q
+TERM=xterm-256color
+USERNAME=diego
+SystemRoot=C:\Windows
+CHROME_CRASHPAD_PIPE_NAME=\\.\pipe\crashpad_19928_NNESPEUSITMOEVOT
+GIT_EXEC_PATH=C:/Program Files/Git/mingw64/libexec/git-core
+PLINK_PROTOCOL=ssh
+OneDrive=C:\Users\diego\OneDrive
+USERDOMAIN_ROAMINGPROFILE=LAPTOP-AEC67A0Q
+CommonProgramFiles=C:\Program Files\Common Files
+VSCODE_INJECTION=1
+VSCODE_PYTHON_AUTOACTIVATE_GUARD=1
+EFC_7260_1592913036=1
+ProgramData=C:\ProgramData
+LANG=en_US.UTF-8
+GIT_ASKPASS=c:\Users\diego\AppData\Roaming\Code\User\globalStorage\vscode.git\askpass\493597c785d4c5cb\askpass.sh
+HOMEPATH=\Users\diego
+OneDriveConsumer=C:\Users\diego\OneDrive
+COMPUTERNAME=LAPTOP-AEC67A0Q
+ALLUSERSPROFILE=C:\ProgramData
+CommonProgramW6432=C:\Program Files\Common Files
+SESSIONNAME=Console
+DriverData=C:\Windows\System32\Drivers\DriverData
+HOMEDRIVE=C:
+windir=C:\Windows
+GIT_TRACE2_PARENT_SID=1d52ffeb-861c-4d1c-b053-38da9cae9c80
+VSCODE_GIT_ASKPASS_NODE=C:\Users\diego\AppData\Local\Programs\Microsoft VS Code\Code.exe
+NUMBER_OF_PROCESSORS=16
+OS=Windows_NT
+ProgramFiles=C:\Program Files
+ComSpec=C:\Windows\system32\cmd.exe
+PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL
+HOME=C:\Users\diego
+PSModulePath=C:\Users\diego\Documents\WindowsPowerShell\Modules;C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules
+TMPDIR=C:\Users\diego\AppData\Local\Temp
+APPDATA=C:\Users\diego\AppData\Roaming
+USERDOMAIN=LAPTOP-AEC67A0Q
+PROCESSOR_LEVEL=25
+LOCALAPPDATA=C:\Users\diego\AppData\Local
+EFC_7260_4126798990=1
+TERM_PROGRAM_VERSION=1.122.1
+CommonProgramFiles(x86)=C:\Program Files (x86)\Common Files
+COLORTERM=truecolor
+PUBLIC=C:\Users\Public
+TERM_PROGRAM=vscode
+VSCODE_GIT_ASKPASS_EXTRA_ARGS=
+
+
+------------
+Diagnostic: File system
+Skipped: False
+Success: True
+Exception: None
+Log:
+Temporary directory is 'C:\Users\diego\AppData\Local\Temp\'...
+Checking basic file I/O...
+Writing to temporary file 'C:\Users\diego\AppData\Local\Temp\a4ef445eb6e9fd5bcb214137'... OK
+Reading from temporary file 'C:\Users\diego\AppData\Local\Temp\a4ef445eb6e9fd5bcb214137'... OK
+Deleting temporary file 'C:\Users\diego\AppData\Local\Temp\a4ef445eb6e9fd5bcb214137'... OK
+Testing IFileSystem instance...
+UserHomePath: C:\Users\diego
+UserDataDirectoryPath: C:\Users\diego\.gcm
+GetCurrentDirectory(): C:\Users\diego\Music\STORE
+
+------------
+Diagnostic: Networking
+Skipped: False
+Success: True
+Exception: None
+Log:
+Checking networking and HTTP stack...
+Creating HTTP client... OK
+IsNetworkAvailable: True
+Sending HEAD request to http://example.com...Sending HEAD request to https://example.com... OK
+Acquiring free TCP port... OK
+Testing local HTTP loopback connections...
+Creating new HTTP listener for http://localhost:49682/... OK
+Waiting for loopback connection... OK
+Writing response... OK
+Waiting for response data... OK
+Loopback connection data OK
+
+------------
+Diagnostic: Git
+Skipped: False
+Success: True
+Exception: None
+Log:
+Getting Git version... OK
+Git version is '2.54.0.windows.1'
+Locating current repository...Git repository at 'C:/Users/diego/Music/STORE/.git'
+ OK
+Listing all Git configuration... OK
+Git configuration:
+file:C:/Program Files/Git/etc/gitconfig	diff.astextplain.textconv=astextplain
+file:C:/Program Files/Git/etc/gitconfig	filter.lfs.clean=git-lfs clean -- %f
+file:C:/Program Files/Git/etc/gitconfig	filter.lfs.smudge=git-lfs smudge -- %f
+file:C:/Program Files/Git/etc/gitconfig	filter.lfs.process=git-lfs filter-process
+file:C:/Program Files/Git/etc/gitconfig	filter.lfs.required=true
+file:C:/Program Files/Git/etc/gitconfig	http.sslbackend=schannel
+file:C:/Program Files/Git/etc/gitconfig	core.autocrlf=true
+file:C:/Program Files/Git/etc/gitconfig	core.fscache=true
+file:C:/Program Files/Git/etc/gitconfig	core.symlinks=false
+file:C:/Program Files/Git/etc/gitconfig	pull.rebase=false
+file:C:/Program Files/Git/etc/gitconfig	credential.helper=manager
+file:C:/Program Files/Git/etc/gitconfig	credential.https://dev.azure.com.usehttppath=true
+file:C:/Program Files/Git/etc/gitconfig	init.defaultbranch=master
+file:C:/Users/diego/.gitconfig	user.name=isontime606-ai
+file:C:/Users/diego/.gitconfig	user.email=isontime606@gmail.com
+file:.git/config	core.repositoryformatversion=0
+file:.git/config	core.filemode=false
+file:.git/config	core.bare=false
+file:.git/config	core.logallrefupdates=true
+file:.git/config	core.symlinks=false
+file:.git/config	core.ignorecase=true
+file:.git/config	remote.origin.url=https://github.com/isontime606-ai/ison-store.git
+file:.git/config	remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+
+
+------------
+Diagnostic: Credential storage
+Skipped: False
+Success: True
+Exception: None
+Log:
+ICredentialStore instance is of type: CredentialStore
+Writing test credential... OK
+Reading test credential... OK
+Deleting test credential... OK
+

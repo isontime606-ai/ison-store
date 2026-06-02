@@ -714,7 +714,7 @@ async function loadProductsFromSupabase() {
   const { data, error } = await supabaseClient
     .from('products')
     .select('*')
-    .eq('visible', true);
+    
 
   console.log('PRODUCTOS:', data);
   console.log('ERROR:', error);
