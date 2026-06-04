@@ -871,7 +871,6 @@ function renderSales(){
   `).join(''):'<tr><td colspan="9" style="text-align:center;color:var(--text-light);padding:2rem;">Sin ventas</td></tr>';
 }
 function updateSaleStatus(id,estado){
-function updateSaleStatus(id,estado){
     const s=sales.find(x=>x.id===id);
     if(!s) return;
 
@@ -902,7 +901,7 @@ function updateSaleStatus(id,estado){
 
     showAdminToast('Estado actualizado');
 }
-}
+
 function deleteSale(id){ if(!confirm('¿Eliminar esta venta?')) return; sales=sales.filter(s=>s.id!==id); saveSales(); renderSales(); }
 function openSaleModal(){
   document.getElementById('sProducto').innerHTML=products.map(p=>`<option value="${p.id}">${p.name} — ${fmt(p.precio)}</option>`).join('');
