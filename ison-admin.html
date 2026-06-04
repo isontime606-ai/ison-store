@@ -500,7 +500,9 @@
 // ══════════════════════════════════════
 // STATE
 // ══════════════════════════════════════
-let currentUser = null;
+let currentUser = JSON.parse(
+  localStorage.getItem('ison_session') || 'null'
+);
 let editingProductId = null;
 let salesFilter = 'todos';
 let productSearch = '';
@@ -521,7 +523,28 @@ let coupons = JSON.parse(localStorage.getItem('ison_coupons')||'[]');
 function saveCoupons(){ localStorage.setItem('ison_coupons',JSON.stringify(coupons)); }
 
 const cfg = JSON.parse(localStorage.getItem('ison_config')||'{}');
+window.addEventListener('load', () => {
 
+    if(!currentUser) return;
+
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').style.display='block';
+
+    document.getElementById('sidebarUser').textContent=currentUser.user;
+
+    document.getElementById('sidebarRole').textContent =
+        currentUser.rol === 'admin'
+        ? 'Administrador'
+        : 'Vendedor';
+
+    if(currentUser.rol !== 'admin'){
+        document.querySelectorAll('[data-admin]')
+        .forEach(el => el.style.display='none');
+    }
+
+    initDashboard();
+
+});
 // ══════════════════════════════════════
 // LOGIN
 // ══════════════════════════════════════
@@ -531,6 +554,10 @@ function doLogin(){
   const found=users.find(x=>x.user===u&&x.pass===p);
   if(!found){ document.getElementById('loginErr').style.display='block'; return; }
   currentUser=found;
+  localStorage.setItem(
+  'ison_session',
+  JSON.stringify(found)
+);
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('sidebarUser').textContent=found.user;
@@ -541,7 +568,15 @@ function doLogin(){
   }
   initDashboard();
 }
-function logout(){ currentUser=null; document.getElementById('loginScreen').style.display='flex'; document.getElementById('app').style.display='none'; }
+function logout(){
+
+    localStorage.removeItem('ison_session');
+
+    currentUser = null;
+
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+}
 
 // ══════════════════════════════════════
 // PANELS
@@ -836,10 +871,37 @@ function renderSales(){
   `).join(''):'<tr><td colspan="9" style="text-align:center;color:var(--text-light);padding:2rem;">Sin ventas</td></tr>';
 }
 function updateSaleStatus(id,estado){
-  const s=sales.find(x=>x.id===id);
-  if(!s) return;
-  s.estado=estado;
-  saveSales(); showAdminToast('Estado actualizado');
+function updateSaleStatus(id,estado){
+    const s=sales.find(x=>x.id===id);
+    if(!s) return;
+
+    const estadoAnterior = s.estado;
+
+    s.estado = estado;
+
+    // Si pasa de pendiente a cancelado, devolver stock
+    if(estadoAnterior === 'pendiente' && estado === 'cancelado'){
+
+        const prod = products.find(p => p.id === s.productoId);
+
+        if(prod){
+            prod.stock = (parseInt(prod.stock) || 0) + (parseInt(s.cantidad) || 1);
+            saveProducts();
+        }
+    }
+
+    saveSales();
+
+    if(typeof renderInventory === 'function'){
+        renderInventory();
+    }
+
+    if(typeof renderProductsTable === 'function'){
+        renderProductsTable();
+    }
+
+    showAdminToast('Estado actualizado');
+}
 }
 function deleteSale(id){ if(!confirm('¿Eliminar esta venta?')) return; sales=sales.filter(s=>s.id!==id); saveSales(); renderSales(); }
 function openSaleModal(){

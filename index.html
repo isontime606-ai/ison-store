@@ -772,7 +772,7 @@ if(cfg.aboutText) document.getElementById('aboutText').textContent = cfg.aboutTe
 // Demo products if empty
 if(products.length === 0) {
   products = [ ];
-  localStorage.setItem('ison_products', JSON.stringify(products));
+  
 }
 
 // ══════════════════════════════════════
@@ -909,7 +909,9 @@ function buyWhatsApp(p){
   localStorage.setItem('ison_sales',JSON.stringify(sales));
   // Decrement stock
   const prod=products.find(x=>x.id===p.id);
-  if(prod){ prod.stock=Math.max(0,prod.stock-1); localStorage.setItem('ison_products',JSON.stringify(products)); }
+  if(prod){
+    prod.stock = Math.max(0, prod.stock - 1);
+}
   showToast('Venta registrada. Se abrirá WhatsApp...');
   // Open WhatsApp
   const wa = cfg.whatsapp || WHATSAPP;
@@ -952,8 +954,8 @@ function buyAllFavs(){
     const prod=products.find(x=>x.id===p.id);
     if(prod) prod.stock=Math.max(0,prod.stock-1);
   });
-  localStorage.setItem('ison_sales',JSON.stringify(sales));
-  localStorage.setItem('ison_products',JSON.stringify(products));
+  localStorage.setItem('ison_sales', JSON.stringify(sales));
+// localStorage.setItem('ison_products', JSON.stringify(products));
   showToast('Ventas registradas. Se abrirá WhatsApp...');
   const wa = cfg.whatsapp || WHATSAPP;
   const num = wa.replace(/\D/g,'');
