@@ -633,6 +633,7 @@ function initDashboard(){
 // PRODUCTS
 // ══════════════════════════════════════
 function renderProductsTable(){
+  console.log('PRODUCTOS ADMIN:', products);
   const filtered=productSearch?products.filter(p=>(p.name+p.brand+p.ref).toLowerCase().includes(productSearch)):products;
   document.getElementById('productsBody').innerHTML=filtered.length?filtered.map(p=>`
     <tr>
