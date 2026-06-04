@@ -708,7 +708,7 @@
 // ══════════════════════════════════════
 // DATA & STATE
 // ══════════════════════════════════════
-const WHATSAPP = localStorage.getItem('ison_wa') || '+573000000000';
+const WHATSAPP = localStorage.getItem('ison_wa') || '+573128447044';
 let products = [];
 async function loadProductsFromSupabase() {
   const { data, error } = await supabaseClient
@@ -752,7 +752,7 @@ async function loadProductsFromSupabase() {
   }
 }
 
-loadProductsFromSupabase();
+
 let favorites = JSON.parse(localStorage.getItem('ison_favs') || '[]');
 let currentFilter = 'todos';
 let currentProduct = null;
@@ -792,7 +792,13 @@ function saveFavs(){ localStorage.setItem('ison_favs',JSON.stringify(favorites))
 // ══════════════════════════════════════
 function renderProducts(list = products){
   const grid = document.getElementById('productsGrid');
-  const noP = document.getElementById('noProducts');
+
+if (!grid) {
+  console.error('productsGrid no existe');
+  return;
+}
+
+const noP = document.getElementById('noProducts');
   const visible = list.filter(p=>p.visible!==false);
   if(visible.length===0){ noP.style.display='block'; grid.innerHTML=''; grid.appendChild(noP); return; }
   noP.style.display='none';
@@ -1034,6 +1040,11 @@ window.addEventListener('storage', e=>{
     if(nc.bannerTitle) document.getElementById('bannerTitle').innerHTML=nc.bannerTitle;
     if(nc.bannerSubtitle) document.getElementById('bannerSubtitle').textContent=nc.bannerSubtitle;
   }
+});
+
+window.addEventListener('load', async () => {
+  await loadProductsFromSupabase();
+  renderProducts();
 });
 </script>
 
