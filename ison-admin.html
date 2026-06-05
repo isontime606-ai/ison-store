@@ -523,9 +523,19 @@ let coupons = JSON.parse(localStorage.getItem('ison_coupons')||'[]');
 function saveCoupons(){ localStorage.setItem('ison_coupons',JSON.stringify(coupons)); }
 
 const cfg = JSON.parse(localStorage.getItem('ison_config')||'{}');
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
 
     if(!currentUser) return;
+
+    const { data, error } = await supabaseClient
+        .from('products')
+        .select('*');
+
+    if(!error){
+        products = data || [];
+    }else{
+        console.error('Error cargando productos:', error);
+    }
 
     document.getElementById('loginScreen').style.display='none';
     document.getElementById('app').style.display='block';
