@@ -712,10 +712,12 @@ const WHATSAPP = localStorage.getItem('ison_wa') || '+573128447044';
 let products = [];
 async function loadProductsFromSupabase() {
   console.time('carga');
+  console.log('iniciando consulta...');
 
 const { data, error } = await supabaseClient
 .from('products')
 .select('*');
+console.log('consulta terminada');
 
 console.timeEnd('carga');
 console.log('DATA:', data);
@@ -811,7 +813,7 @@ const noP = document.getElementById('noProducts');
   grid.innerHTML = visible.map(p=>`
     <div class="card" data-id="${p.id}">
       <div class="card-img-wrap" onclick="openModal('${p.id}')">
-        <img loading="lazy" src="${p.img||'https://images.unsplash.com/...'}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80'">
+        <img src="${p.img||'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80'}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80'">
         ${p.precioDesc>0?'<span class="card-badge">OFERTA</span>':''}
         <button class="fav-btn ${isFav(p.id)?'active':''}" onclick="event.stopPropagation();toggleFav(p=${JSON.stringify(p).replace(/"/g,'&quot;')})" id="fav-${p.id}">
           ${isFav(p.id)?'❤':'♡'}
