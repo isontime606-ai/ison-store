@@ -774,7 +774,23 @@ function saveProduct(){
   }
 }
 async function finalizeSaveProduct(mainImg,galleryImgs){
+  
   const imgs=[...(mainImg?[mainImg]:[]),...galleryImgs];
+  async function finalizeSaveProduct(mainImg,galleryImgs){
+
+  let imageUrl = mainImg;
+
+  const mainFile = document.getElementById('pImg').files[0];
+
+  if(mainFile){
+    const uploadedUrl = await uploadImage(mainFile);
+
+    if(uploadedUrl){
+      imageUrl = uploadedUrl;
+    }
+  }
+
+  const imgs=[...(imageUrl?[imageUrl]:[]),...galleryImgs];
   const data={
     id: editingProductId||'p'+Date.now(),
     name:document.getElementById('pNombre').value.trim(),
@@ -788,7 +804,7 @@ async function finalizeSaveProduct(mainImg,galleryImgs){
     color:document.getElementById('pColor').value.trim(),
     garantia:document.getElementById('pGarantia').value.trim(),
     descripcion:document.getElementById('pDesc').value.trim(),
-    img:mainImg||imgs[0]||'',
+    img:imageUrl||imgs[0]||'',
     imgs,
     visible:document.getElementById('pVisible').checked
   };
@@ -803,7 +819,8 @@ const { error } = await supabaseClient
     description: data.descripcion,
     price: data.precio,
     stock: data.stock,
-    image: '',
+    image: imageUrl,
+image_url: imageUrl,
     ref: data.ref,
     brand: data.brand,
     categoria: data.categoria,
