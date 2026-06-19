@@ -774,10 +774,6 @@ function saveProduct(){
   }
 }
 async function finalizeSaveProduct(mainImg,galleryImgs){
-  
-  const imgs=[...(mainImg?[mainImg]:[]),...galleryImgs];
-  async function finalizeSaveProduct(mainImg,galleryImgs){
-
   let imageUrl = mainImg;
 
   const mainFile = document.getElementById('pImg').files[0];
@@ -820,7 +816,7 @@ const { error } = await supabaseClient
     price: data.precio,
     stock: data.stock,
     image: imageUrl,
-image_url: imageUrl,
+    image_url: imageUrl,
     ref: data.ref,
     brand: data.brand,
     categoria: data.categoria,
