@@ -786,7 +786,10 @@ async function finalizeSaveProduct(mainImg,galleryImgs){
     }
   }
 
-  const imgs=[...(imageUrl?[imageUrl]:[]),...galleryImgs];
+ const imgs = [
+    ...(imageUrl ? [imageUrl] : []),
+    ...galleryImgs
+];
   const data={
     id: editingProductId||'p'+Date.now(),
     name:document.getElementById('pNombre').value.trim(),
@@ -828,6 +831,15 @@ const { error } = await supabaseClient
   }]);
 
 console.log("SUPABASE ERROR:", error);
+if(error){
+    alert("Error al guardar el producto:\n" + error.message);
+    return;
+}
+
+saveProducts();
+renderProductsTable();
+closeProductModal();
+showAdminToast("Producto guardado correctamente");
 
 // saveProducts();
 }
