@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ISON — Relojes Premium</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" referrerpolicy="no-referrer">
 <style>
   :root {
     --navy: #0B1926;
@@ -43,6 +44,7 @@
     background:none; border:none; cursor:pointer; color:var(--text-light);
     font-size:1.2rem; transition:color .25s; padding:.3rem;
   }
+  .icon-btn i,.contact-icon i,.social-link i,.fav-btn i,.fav-item-del i,.modal-close i{font-size:1em;line-height:1;}
   .icon-btn:hover { color:var(--gold); }
   .fav-badge {
     position:relative; display:inline-flex;
@@ -489,7 +491,7 @@
       <button class="icon-btn" onclick="toggleSearch()" title="Buscar">&#x2315;</button>
     </div>
     <div class="fav-badge">
-      <button class="icon-btn" onclick="toggleFavPanel()" title="Favoritos">♡</button>
+      <button class="icon-btn" onclick="toggleFavPanel()" title="Favoritos" aria-label="Favoritos"><i class="fa-regular fa-heart"></i></button>
       <span class="fav-count" id="favCount">0</span>
     </div>
     <button class="hamburger" id="hamburger" onclick="toggleMenu()">
@@ -504,7 +506,7 @@
   <a href="#catalogo" onclick="toggleMenu()">Catálogo</a>
   <a href="#sobre" onclick="toggleMenu()">Nosotros</a>
   <a href="#contacto" onclick="toggleMenu()">Contacto</a>
-  <a href="#" onclick="toggleMenu();toggleFavPanel()">Favoritos ♡</a>
+  <a href="#" onclick="toggleMenu();toggleFavPanel()">Favoritos <i class="fa-regular fa-heart"></i></a>
 </div>
 
 <!-- HERO -->
@@ -572,31 +574,31 @@
     <div class="contact-grid">
       <div>
         <div class="contact-info-item">
-          <span class="contact-icon">📱</span>
+          <span class="contact-icon"><i class="fa-brands fa-whatsapp"></i></span>
           <div>
             <p class="contact-label">WhatsApp</p>
             <p class="contact-val" id="contactWA">+57 3128447044</p>
           </div>
         </div>
         <div class="contact-info-item">
-          <span class="contact-icon">📷</span>
+          <span class="contact-icon"><i class="fa-brands fa-instagram"></i></span>
           <div>
             <p class="contact-label">Instagram</p>
             <p class="contact-val" id="contactIG">@isonrelojes</p>
           </div>
         </div>
         <div class="contact-info-item">
-          <span class="contact-icon">🎵</span>
+          <span class="contact-icon"><i class="fa-brands fa-tiktok"></i></span>
           <div>
             <p class="contact-label">TikTok</p>
             <p class="contact-val" id="contactTK">@isonrelojes</p>
           </div>
         </div>
         <div class="socials">
-          <a class="social-link" href="#" title="WhatsApp">📱</a>
-          <a class="social-link" href="#" title="Instagram">📷</a>
-          <a class="social-link" href="#" title="Facebook">👥</a>
-          <a class="social-link" href="#" title="TikTok">🎵</a>
+          <a class="social-link" href="#" title="WhatsApp" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+          <a class="social-link" href="#" title="Instagram" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a class="social-link" href="#" title="Facebook" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a class="social-link" href="#" title="TikTok" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
         </div>
       </div>
       <div>
@@ -639,10 +641,10 @@
       <div>
         <p class="footer-col-title">Síguenos</p>
         <div class="socials" style="flex-wrap:wrap;">
-          <a class="social-link" href="#">📱</a>
-          <a class="social-link" href="#">📷</a>
-          <a class="social-link" href="#">👥</a>
-          <a class="social-link" href="#">🎵</a>
+          <a class="social-link" href="#" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+          <a class="social-link" href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a class="social-link" href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a class="social-link" href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
         </div>
       </div>
     </div>
@@ -656,7 +658,7 @@
 <!-- PRODUCT MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
   <div class="modal" id="productModal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
+    <button class="modal-close" onclick="closeModal()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
     <div class="modal-inner">
       <div class="modal-gallery">
         <img class="modal-main-img" id="modalMainImg" src="" alt="">
@@ -678,7 +680,7 @@
         </div>
         <div class="modal-actions">
           <button class="btn-primary" onclick="buyWhatsApp(currentProduct)">COMPRAR →</button>
-          <button class="btn-outline" onclick="toggleFav(currentProduct)" id="modalFavBtn">♡ Favorito</button>
+          <button class="btn-outline" onclick="toggleFav(currentProduct)" id="modalFavBtn"><i class="fa-regular fa-heart"></i> Favorito</button>
         </div>
       </div>
     </div>
@@ -689,7 +691,7 @@
 <div class="fav-panel" id="favPanel">
   <div class="fav-panel-header">
     <span class="fav-panel-title">Mis Favoritos</span>
-    <button class="icon-btn" onclick="toggleFavPanel()">✕</button>
+    <button class="icon-btn" onclick="toggleFavPanel()" aria-label="Cerrar favoritos"><i class="fa-solid fa-xmark"></i></button>
   </div>
   <div class="fav-panel-body" id="favBody"></div>
   <div class="fav-panel-footer">
@@ -735,7 +737,8 @@ console.log('ERROR:', error);
     descripcion: p.description || '',
     precio: p.price || 0,
     stock: p.stock || 0,
-    img: p.image || '',
+    img: p.image_url || p.image || '',
+    imgs: [...new Set([p.image_url || p.image || '', ...(Array.isArray(p.image_urls) ? p.image_urls : [])].filter(Boolean))],
     brand: p.brand || 'ISON',
     ref: p.ref || '',
     categoria: p.categoria || '',
@@ -764,6 +767,24 @@ console.log('ERROR:', error);
 let favorites = JSON.parse(localStorage.getItem('ison_favs') || '[]');
 let currentFilter = 'todos';
 let currentProduct = null;
+async function reserveStock(productId, quantity){
+  for(let attempt=0;attempt<3;attempt++){
+    const {data:current,error:readError}=await supabaseClient.from('products').select('id,stock').eq('id',productId).single();
+    if(readError) throw readError;
+    const stock=Number(current.stock || 0);
+    if(stock<quantity) throw new Error('Este producto ya no tiene stock disponible.');
+    const {data,error}=await supabaseClient.from('products').update({stock:stock-quantity}).eq('id',productId).eq('stock',current.stock).select().maybeSingle();
+    if(error) throw error;
+    if(data){ const local=products.find(p=>p.id===productId); if(local) local.stock=stock-quantity; return; }
+  }
+  throw new Error('El inventario cambió. Intenta de nuevo.');
+}
+async function registerWhatsAppSale(p){
+  await reserveStock(p.id,1);
+  const sale={id:'s'+Date.now()+'_'+Math.random().toString(36).slice(2),fecha:new Date().toISOString(),productoId:p.id,producto:p.name,cantidad:1,cliente:'',ciudad:'',telefono:'',canal:'whatsapp',estado:'pendiente',total:p.precioDesc>0?p.precioDesc:p.precio};
+  const {error}=await supabaseClient.from('sales').insert(sale);
+  if(error){ await reserveStock(p.id,-1); throw error; }
+}
 
 // Load config from admin
 const cfg = JSON.parse(localStorage.getItem('ison_config') || '{}');
@@ -813,10 +834,10 @@ const noP = document.getElementById('noProducts');
   grid.innerHTML = visible.map(p=>`
     <div class="card" data-id="${p.id}">
       <div class="card-img-wrap" onclick="openModal('${p.id}')">
-        <img src="${p.img||'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80'}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80'">
+        <img loading="lazy" decoding="async" src="${p.img||'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80'}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80'">
         ${p.precioDesc>0?'<span class="card-badge">OFERTA</span>':''}
         <button class="fav-btn ${isFav(p.id)?'active':''}" onclick="event.stopPropagation();toggleFav(p=${JSON.stringify(p).replace(/"/g,'&quot;')})" id="fav-${p.id}">
-          ${isFav(p.id)?'❤':'♡'}
+          <i class="${isFav(p.id)?'fa-solid':'fa-regular'} fa-heart"></i>
         </button>
       </div>
       <div class="card-body" onclick="openModal('${p.id}')">
@@ -880,7 +901,7 @@ function openModal(id){
     <img src="${src}" class="${i===0?'active':''}" onclick="setMainImg(this,'${src}')">
   `).join('');
   // fav btn
-  document.getElementById('modalFavBtn').textContent = isFav(p.id)?'❤ Favorito':'♡ Favorito';
+  document.getElementById('modalFavBtn').innerHTML = `<i class="${isFav(p.id)?'fa-solid':'fa-regular'} fa-heart"></i> Favorito`;
   document.getElementById('modalOverlay').classList.add('open');
   document.body.style.overflow='hidden';
 }
@@ -895,31 +916,9 @@ function closeModalOutside(e){ if(e.target===document.getElementById('modalOverl
 // ══════════════════════════════════════
 // WHATSAPP
 // ══════════════════════════════════════
-function buyWhatsApp(p){
-  // Register sale automatically
-  const saleId='s'+Date.now();
-  const sale={
-    id:saleId,
-    fecha:new Date().toISOString(),
-    productoId:p.id,
-    producto:p.name,
-    cantidad:1,
-    cliente:'',
-    ciudad:'',
-    telefono:'',
-    canal:'whatsapp',
-    estado:'pendiente',
-    total:p.precioDesc>0?p.precioDesc:p.precio
-  };
-  // Get sales from localStorage if not already loaded
-  let sales=JSON.parse(localStorage.getItem('ison_sales')||'[]');
-  sales.push(sale);
-  localStorage.setItem('ison_sales',JSON.stringify(sales));
-  // Decrement stock
-  const prod=products.find(x=>x.id===p.id);
-  if(prod){
-    prod.stock = Math.max(0, prod.stock - 1);
-}
+async function buyWhatsApp(p){
+  try { await registerWhatsAppSale(p); }
+  catch(error){ console.error('No se pudo registrar la venta:',error); showToast(error.message || 'No se pudo registrar la venta.'); return; }
   showToast('Venta registrada. Se abrirá WhatsApp...');
   // Open WhatsApp
   const wa = cfg.whatsapp || WHATSAPP;
@@ -940,35 +939,16 @@ Gracias.`
   window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
 }
 
-function buyAllFavs(){
+async function buyAllFavs(){
   if(favorites.length===0){ showToast('No tienes favoritos'); return; }
-  // Register sales for all favorites
-  let sales=JSON.parse(localStorage.getItem('ison_sales')||'[]');
-  favorites.forEach(p=>{
-    const sale={
-      id:'s'+Date.now()+'_'+Math.random().toString(36).substr(2,9),
-      fecha:new Date().toISOString(),
-      productoId:p.id,
-      producto:p.name,
-      cantidad:1,
-      cliente:'',
-      ciudad:'',
-      telefono:'',
-      canal:'whatsapp',
-      estado:'pendiente',
-      total:p.precioDesc>0?p.precioDesc:p.precio
-    };
-    sales.push(sale);
-    const prod=products.find(x=>x.id===p.id);
-    if(prod) prod.stock=Math.max(0,prod.stock-1);
-  });
-  localStorage.setItem('ison_sales', JSON.stringify(sales));
-// localStorage.setItem('ison_products', JSON.stringify(products));
+  try { for(const p of favorites) await registerWhatsAppSale(p); }
+  catch(error){ console.error('No se pudieron registrar las ventas:',error); showToast(error.message || 'No se pudieron registrar las ventas.'); return; }
   showToast('Ventas registradas. Se abrirá WhatsApp...');
   const wa = cfg.whatsapp || WHATSAPP;
   const num = wa.replace(/\D/g,'');
   
   const total = favorites.reduce((s,p)=>s+(p.precioDesc>0?p.precioDesc:p.precio),0);
+  const list=favorites.map(p=>`• ${p.name} (${fmt(p.precioDesc>0?p.precioDesc:p.precio)})`).join('\n');
   const msg = encodeURIComponent(`Hola ISON.\n\nEstoy interesado en los siguientes productos:\n\n${list}\n\nTotal: ${fmt(total)}\n\nGracias.`);
   window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
 }
@@ -986,13 +966,13 @@ function sendContactWA(){
 function toggleFav(p){
   const idx = favorites.findIndex(f=>f.id===p.id);
   if(idx>=0){ favorites.splice(idx,1); showToast('Eliminado de favoritos'); }
-  else { favorites.push(p); showToast('Agregado a favoritos ♡'); }
+  else { favorites.push(p); showToast('Agregado a favoritos'); }
   saveFavs(); renderFavPanel();
   // update buttons
   const btn = document.getElementById('fav-'+p.id);
-  if(btn){ btn.textContent = isFav(p.id)?'❤':'♡'; btn.classList.toggle('active',isFav(p.id)); }
+  if(btn){ btn.innerHTML=`<i class="${isFav(p.id)?'fa-solid':'fa-regular'} fa-heart"></i>`; btn.classList.toggle('active',isFav(p.id)); }
   if(document.getElementById('modalFavBtn') && currentProduct && currentProduct.id===p.id){
-    document.getElementById('modalFavBtn').textContent = isFav(p.id)?'❤ Favorito':'♡ Favorito';
+    document.getElementById('modalFavBtn').innerHTML = `<i class="${isFav(p.id)?'fa-solid':'fa-regular'} fa-heart"></i> Favorito`;
   }
   filterProducts();
 }
@@ -1001,7 +981,7 @@ function updateFavCount(){
   el.textContent=favorites.length;
   el.style.display=favorites.length>0?'flex':'none';
   const hBtn=document.querySelector('.fav-badge .icon-btn');
-  if(hBtn) hBtn.textContent = favorites.length>0?'❤':'♡';
+  if(hBtn) hBtn.innerHTML = `<i class="${favorites.length>0?'fa-solid':'fa-regular'} fa-heart"></i>`;
 }
 function renderFavPanel(){
   const body=document.getElementById('favBody');
@@ -1013,7 +993,7 @@ function renderFavPanel(){
         <p class="fav-item-name">${p.name}</p>
         <p class="fav-item-price">${fmt(p.precioDesc>0?p.precioDesc:p.precio)}</p>
       </div>
-      <button class="fav-item-del" onclick="toggleFav(${JSON.stringify(p).replace(/"/g,'&quot;')})">✕</button>
+      <button class="fav-item-del" onclick="toggleFav(${JSON.stringify(p).replace(/"/g,'&quot;')})" aria-label="Quitar favorito"><i class="fa-solid fa-xmark"></i></button>
     </div>
   `).join('');
 }
@@ -1044,7 +1024,6 @@ filterProducts();
 
 // Listen for storage changes (admin updates)
 window.addEventListener('storage', e=>{
-  if(e.key==='ison_products'){ products=JSON.parse(e.newValue||'[]'); filterProducts(); }
   if(e.key==='ison_config'){
     const nc=JSON.parse(e.newValue||'{}');
     if(nc.bannerTitle) document.getElementById('bannerTitle').innerHTML=nc.bannerTitle;
@@ -1056,6 +1035,11 @@ window.addEventListener('load', async () => {
   await loadProductsFromSupabase();
   renderProducts();
 });
+
+// Mantiene el catálogo actualizado sin recargar ni depender de LocalStorage.
+supabaseClient.channel('store-products')
+  .on('postgres_changes',{event:'*',schema:'public',table:'products'},()=>loadProductsFromSupabase())
+  .subscribe();
 </script>
 
 </body>

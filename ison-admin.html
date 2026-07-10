@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ISON Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" referrerpolicy="no-referrer">
 <style>
   :root{--navy:#0B1926;--gold:#BF9663;--gold-light:#d4aa7d;--gold-dim:rgba(191,150,99,.12);--sidebar:#091520;--card:#0f2035;--text-light:rgba(255,255,255,.65);--border:rgba(191,150,99,.18);--green:#4caf50;--red:#e85d75;--orange:#ff9800;}
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -37,7 +38,8 @@
   .nav-item{display:flex;align-items:center;gap:.8rem;padding:.7rem 1.4rem;cursor:pointer;color:var(--text-light);font-size:.84rem;transition:all .2s;border-left:2px solid transparent;}
   .nav-item:hover{color:#fff;background:var(--gold-dim);}
   .nav-item.active{color:var(--gold);border-left-color:var(--gold);background:var(--gold-dim);}
-  .nav-icon{width:20px;text-align:center;font-size:1rem;}
+  .nav-icon{width:20px;text-align:center;font-size:.95rem;}
+  .nav-icon i,.icon-action i,.modal-close i,.img-prev-del i{line-height:1;}
   .sidebar-footer{margin-top:auto;padding:1rem;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:.5rem;}
   .user-info{font-size:.75rem;color:var(--text-light);}
   .user-role{font-size:.65rem;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;}
@@ -171,16 +173,16 @@
       </div>
       <div class="nav-section">
         <p class="nav-label">Principal</p>
-        <div class="nav-item active" onclick="showPanel('dashboard')"><span class="nav-icon">📊</span>Dashboard</div>
-        <div class="nav-item" onclick="showPanel('productos')"><span class="nav-icon">⌚</span>Productos</div>
-        <div class="nav-item" onclick="showPanel('inventario')"><span class="nav-icon">📦</span>Inventario</div>
-        <div class="nav-item" onclick="showPanel('ventas')"><span class="nav-icon">💰</span>Ventas</div>
-        <div class="nav-item" onclick="showPanel('cupones')"><span class="nav-icon">🏷️</span>Cupones</div>
+        <div class="nav-item active" onclick="showPanel('dashboard')"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span>Dashboard</div>
+        <div class="nav-item" onclick="showPanel('productos')"><span class="nav-icon"><i class="fa-regular fa-clock"></i></span>Productos</div>
+        <div class="nav-item" onclick="showPanel('inventario')"><span class="nav-icon"><i class="fa-solid fa-boxes-stacked"></i></span>Inventario</div>
+        <div class="nav-item" onclick="showPanel('ventas')"><span class="nav-icon"><i class="fa-solid fa-receipt"></i></span>Ventas</div>
+        <div class="nav-item" onclick="showPanel('cupones')"><span class="nav-icon"><i class="fa-solid fa-tags"></i></span>Cupones</div>
       </div>
       <div class="nav-section">
         <p class="nav-label">Sistema</p>
-        <div class="nav-item" onclick="showPanel('config')"><span class="nav-icon">⚙️</span>Configuración</div>
-        <div class="nav-item" onclick="showPanel('usuarios')"><span class="nav-icon">👤</span>Usuarios</div>
+        <div class="nav-item" onclick="showPanel('config')"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span>Configuración</div>
+        <div class="nav-item" onclick="showPanel('usuarios')"><span class="nav-icon"><i class="fa-solid fa-user"></i></span>Usuarios</div>
       </div>
       <div class="sidebar-footer">
         <span class="btn-sm btn-outline" onclick="window.open('index.html','_blank')" style="text-align:center;">Ver Tienda ↗</span>
@@ -346,7 +348,7 @@
   <div class="modal-box">
     <div class="modal-header">
       <h2 class="modal-title" id="productModalTitle">Nuevo Producto</h2>
-      <button class="modal-close" onclick="closeProductModal()">✕</button>
+      <button class="modal-close" onclick="closeProductModal()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
       <div class="form-grid">
@@ -401,7 +403,7 @@
   <div class="modal-box">
     <div class="modal-header">
       <h2 class="modal-title">Registrar Venta</h2>
-      <button class="modal-close" onclick="closeSaleModal()">✕</button>
+      <button class="modal-close" onclick="closeSaleModal()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
       <div class="form-grid">
@@ -442,7 +444,7 @@
   <div class="modal-box" style="max-width:480px;">
     <div class="modal-header">
       <h2 class="modal-title">Nuevo Cupón</h2>
-      <button class="modal-close" onclick="closeCouponModal()">✕</button>
+      <button class="modal-close" onclick="closeCouponModal()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
       <div class="form-grid">
@@ -472,7 +474,7 @@
   <div class="modal-box" style="max-width:480px;">
     <div class="modal-header">
       <h2 class="modal-title">Nuevo Usuario</h2>
-      <button class="modal-close" onclick="document.getElementById('userModalBg').classList.remove('open')">✕</button>
+      <button class="modal-close" onclick="document.getElementById('userModalBg').classList.remove('open')" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
       <div class="form-grid">
@@ -656,9 +658,9 @@ function renderProductsTable(){
       <td><span class="badge ${p.stock>0?'badge-green':'badge-red'}">${p.stock}</span></td>
       <td><span class="badge ${p.visible!==false?'badge-gold':'badge-red'}">${p.visible!==false?'Visible':'Oculto'}</span></td>
       <td><div class="actions-cell">
-        <button class="icon-action" onclick="editProduct('${p.id}')" title="Editar">✏️</button>
-        <button class="icon-action" onclick="toggleVisible('${p.id}')" title="Mostrar/Ocultar">👁️</button>
-        <button class="icon-action del" onclick="deleteProduct('${p.id}')" title="Eliminar">🗑️</button>
+        <button class="icon-action" onclick="editProduct('${p.id}')" title="Editar" aria-label="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+        <button class="icon-action" onclick="toggleVisible('${p.id}')" title="Mostrar/Ocultar" aria-label="Mostrar u ocultar"><i class="fa-solid fa-eye"></i></button>
+        <button class="icon-action del" onclick="deleteProduct('${p.id}')" title="Eliminar" aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
       </div></td>
     </tr>
   `).join(''):'<tr><td colspan="9" style="text-align:center;color:var(--text-light);padding:2rem;">Sin productos. Crea el primero →</td></tr>';
@@ -699,7 +701,7 @@ function editProduct(id){
   document.getElementById('pDesc').value=p.descripcion||'';
   document.getElementById('pImg').dataset.base64=p.img||'';
   document.getElementById('pVisible').checked=p.visible!==false;
-  document.getElementById('mainImgPreview').innerHTML=p.img?`<div style="position:relative;"><img src="${p.img}" style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);border-radius:4px;"><button type="button" class="img-prev-del" onclick="document.getElementById('pImg').dataset.base64='';document.getElementById('mainImgPreview').innerHTML='';">✕</button></div>`:
+  document.getElementById('mainImgPreview').innerHTML=p.img?`<div style="position:relative;"><img src="${p.img}" style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);border-radius:4px;"><button type="button" class="img-prev-del" onclick="document.getElementById('pImg').dataset.base64='';document.getElementById('mainImgPreview').innerHTML='';" aria-label="Quitar imagen"><i class="fa-solid fa-xmark"></i></button></div>`:
 '';
   document.getElementById('galleryImgPreview').innerHTML=(p.imgs||[]).map((img,i)=>`<div style="position:relative;"><img src="${img}" style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);border-radius:4px;"></div>`).join('');
   document.getElementById('productModalBg').classList.add('open');
@@ -715,7 +717,7 @@ function previewMainImg(){
   const reader=new FileReader();
   reader.onload=e=>{
     const src=e.target.result;
-    document.getElementById('mainImgPreview').innerHTML=`<div style="position:relative;"><img src="${src}" style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);border-radius:4px;" id="mainImgThumb"><button type="button" class="img-prev-del" onclick="document.getElementById('pImg').value='';previewMainImg();">✕</button></div>`;
+    document.getElementById('mainImgPreview').innerHTML=`<div style="position:relative;"><img src="${src}" style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);border-radius:4px;" id="mainImgThumb"><button type="button" class="img-prev-del" onclick="document.getElementById('pImg').value='';previewMainImg();" aria-label="Quitar imagen"><i class="fa-solid fa-xmark"></i></button></div>`;
     document.getElementById('pImg').dataset.base64=src;
   };
   reader.readAsDataURL(file);
@@ -735,7 +737,7 @@ function previewGalleryImages(){
       const src=e.target.result;
       const div=document.createElement('div');
       div.style.position='relative';
-      div.innerHTML=`<img src="${src}" style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);border-radius:4px;cursor:pointer;" onclick="setMainFromGallery('${src}')" title="Haz clic para usar como imagen principal"><button type="button" class="img-prev-del" onclick="removeGalleryImage(${idx})">✕</button>`;
+      div.innerHTML=`<img src="${src}" style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);border-radius:4px;cursor:pointer;" onclick="setMainFromGallery('${src}')" title="Haz clic para usar como imagen principal"><button type="button" class="img-prev-del" onclick="removeGalleryImage(${idx})" aria-label="Quitar imagen"><i class="fa-solid fa-xmark"></i></button>`;
       preview.appendChild(div);
     };
     reader.readAsDataURL(file);
@@ -749,7 +751,7 @@ function removeGalleryImage(idx){
   previewGalleryImages();
 }
 function setMainFromGallery(src){
-  document.getElementById('mainImgPreview').innerHTML=`<div style="position:relative;"><img src="${src}" style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);border-radius:4px;"><button type="button" class="img-prev-del" onclick="document.getElementById('pImg').value='';previewMainImg();">✕</button></div>`;
+  document.getElementById('mainImgPreview').innerHTML=`<div style="position:relative;"><img src="${src}" style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);border-radius:4px;"><button type="button" class="img-prev-del" onclick="document.getElementById('pImg').value='';previewMainImg();" aria-label="Quitar imagen"><i class="fa-solid fa-xmark"></i></button></div>`;
   document.getElementById('pImg').dataset.base64=src;
 }
 function saveProduct(){
@@ -902,7 +904,7 @@ function renderSales(){
         </select>
       </td>
       <td>${new Date(s.fecha).toLocaleDateString('es-CO')}</td>
-      <td><button class="icon-action del" onclick="deleteSale('${s.id}')">🗑️</button></td>
+      <td><button class="icon-action del" onclick="deleteSale('${s.id}')" aria-label="Eliminar venta"><i class="fa-solid fa-trash"></i></button></td>
     </tr>
   `).join(''):'<tr><td colspan="9" style="text-align:center;color:var(--text-light);padding:2rem;">Sin ventas</td></tr>';
 }
@@ -988,8 +990,8 @@ function renderCoupons(){
       <td>${c.usos||0}</td>
       <td><span class="badge ${c.activo?'badge-green':'badge-red'}">${c.activo?'Activo':'Inactivo'}</span></td>
       <td><div class="actions-cell">
-        <button class="icon-action" onclick="toggleCoupon('${c.id}')">⏯️</button>
-        <button class="icon-action del" onclick="deleteCoupon('${c.id}')">🗑️</button>
+        <button class="icon-action" onclick="toggleCoupon('${c.id}')" aria-label="Activar o desactivar"><i class="fa-solid fa-toggle-on"></i></button>
+        <button class="icon-action del" onclick="deleteCoupon('${c.id}')" aria-label="Eliminar cupón"><i class="fa-solid fa-trash"></i></button>
       </div></td>
     </tr>
   `).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:2rem;">Sin cupones</td></tr>';
@@ -1043,7 +1045,7 @@ function renderUsers(){
       <td>${u.user}</td>
       <td><span class="badge ${u.rol==='admin'?'badge-gold':'badge-green'}">${u.rol==='admin'?'Administrador':'Vendedor'}</span></td>
       <td><span class="badge badge-green">Activo</span></td>
-      <td><button class="icon-action del" onclick="deleteUser('${u.id}')">🗑️</button></td>
+      <td><button class="icon-action del" onclick="deleteUser('${u.id}')" aria-label="Eliminar usuario"><i class="fa-solid fa-trash"></i></button></td>
     </tr>
   `).join('');
 }
