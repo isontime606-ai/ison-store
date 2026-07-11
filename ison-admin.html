@@ -46,19 +46,21 @@
 
   /* MAIN */
   main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-  .topbar{height:60px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;flex-shrink:0;gap:1rem;}
+  .topbar{height:64px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;flex-shrink:0;gap:1rem;background:linear-gradient(90deg,rgba(15,32,53,.6),rgba(9,21,32,.32));}
   .page-title{font-family:"Cormorant Garamond",serif;font-size:1.4rem;font-weight:300;}
-  .topbar-actions{display:flex;gap:.8rem;align-items:center;}
-  .btn-sm{font-family:"Jost",sans-serif;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;padding:.55rem 1.2rem;cursor:pointer;border:none;transition:all .2s;}
-  .btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy);font-weight:500;}
-  .btn-primary:hover{opacity:.88;}
-  .btn-danger{background:rgba(232,93,117,.15);color:var(--red);border:1px solid rgba(232,93,117,.3);}
-  .btn-outline{background:transparent;color:var(--gold);border:1px solid var(--border);}
-  .btn-outline:hover{background:var(--gold-dim);}
-  .btn-green{background:rgba(76,175,80,.15);color:var(--green);border:1px solid rgba(76,175,80,.3);}
+  .topbar-actions,.topbar-tools{display:flex;gap:.8rem;align-items:center;}
+  .notification-wrap{position:relative;}.notification-btn{width:34px;height:34px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--gold);cursor:pointer;position:relative;border-radius:50%;}.notification-count{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;padding:0 4px;border-radius:10px;background:var(--red);color:#fff;font-size:.6rem;display:none;align-items:center;justify-content:center;}.notification-panel{position:absolute;top:44px;right:0;width:min(340px,calc(100vw - 2rem));background:#0f2035;border:1px solid var(--border);box-shadow:0 16px 38px rgba(0,0,0,.35);z-index:700;display:none;}.notification-panel.open{display:block;}.notification-title{padding:1rem 1.1rem;border-bottom:1px solid var(--border);font-size:.72rem;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;}.notification-item{display:flex;gap:.7rem;padding:.85rem 1.1rem;border-bottom:1px solid rgba(191,150,99,.08);font-size:.8rem;color:var(--text-light);}.notification-item:last-child{border-bottom:0;}.notification-item i{color:var(--orange);margin-top:.1rem;}.notification-empty{padding:1.2rem;color:var(--text-light);font-size:.82rem;text-align:center;}
+  .btn-sm{font-family:"Jost",sans-serif;font-size:.72rem;letter-spacing:.11em;text-transform:uppercase;padding:.62rem 1.15rem;cursor:pointer;border:1px solid transparent;border-radius:7px;transition:transform .2s,box-shadow .2s,background .2s;}
+  .btn-sm:hover{transform:translateY(-1px);}.btn-sm:active{transform:translateY(0);}
+  .btn-primary{background:linear-gradient(135deg,var(--gold-light),var(--gold));color:var(--navy);font-weight:500;box-shadow:0 6px 16px rgba(191,150,99,.18);}
+  .btn-primary:hover{box-shadow:0 9px 20px rgba(191,150,99,.28);}
+  .btn-danger{background:rgba(232,93,117,.12);color:var(--red);border-color:rgba(232,93,117,.32);}
+  .btn-outline{background:rgba(255,255,255,.025);color:var(--gold);border-color:var(--border);}
+  .btn-outline:hover{background:var(--gold-dim);border-color:rgba(191,150,99,.42);}
+  .btn-green{background:rgba(76,175,80,.12);color:var(--green);border-color:rgba(76,175,80,.32);}
 
   /* CONTENT */
-  .content{flex:1;overflow-y:auto;padding:2rem;}
+  .content{flex:1;overflow-y:auto;padding:2rem;background:radial-gradient(circle at 100% 0,rgba(191,150,99,.055),transparent 28%);}
 
   /* PANELS */
   .panel{display:none;}
@@ -66,16 +68,17 @@
 
   /* DASHBOARD */
   .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.2rem;margin-bottom:2rem;}
-  .stat-card{background:var(--card);border:1px solid var(--border);padding:1.5rem;position:relative;overflow:hidden;}
+  .stat-card{background:linear-gradient(145deg,rgba(20,42,66,.96),var(--card));border:1px solid var(--border);border-radius:10px;padding:1.5rem;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;}
+  .stat-card:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(0,0,0,.18);}
   .stat-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold);}
   .stat-label{font-size:.7rem;letter-spacing:.2em;color:var(--text-light);text-transform:uppercase;margin-bottom:.5rem;}
   .stat-val{font-family:"Cormorant Garamond",serif;font-size:2.2rem;color:var(--gold);}
   .stat-sub{font-size:.72rem;color:var(--text-light);margin-top:.2rem;}
 
   /* TABLE */
-  .table-wrap{background:var(--card);border:1px solid var(--border);overflow-x:auto;}
+  .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow-x:auto;box-shadow:0 10px 25px rgba(0,0,0,.1);}
   table{width:100%;border-collapse:collapse;}
-  th{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text-light);padding:.9rem 1.2rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);padding:1rem 1.2rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;background:rgba(0,0,0,.1);}
   td{padding:.8rem 1.2rem;font-size:.85rem;border-bottom:1px solid rgba(191,150,99,.07);vertical-align:middle;}
   tr:last-child td{border-bottom:none;}
   tr:hover td{background:var(--gold-dim);}
@@ -106,9 +109,10 @@
   .form-group{display:flex;flex-direction:column;gap:.4rem;}
   .form-group.full{grid-column:1/-1;}
   .form-label{font-size:.72rem;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;}
-  .form-input{background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;padding:.7rem .9rem;outline:none;transition:border-color .2s;font-size:.88rem;width:100%;}
-  .form-input:focus{border-color:var(--gold);}
-  .form-input option{background:#0f2035;}
+  .form-input{background:rgba(255,255,255,.055);border:1px solid var(--border);border-radius:7px;color:#fff;padding:.72rem .9rem;outline:none;transition:border-color .2s,box-shadow .2s,background .2s;font-size:.88rem;width:100%;}
+  .form-input:hover{border-color:rgba(191,150,99,.36);}.form-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(191,150,99,.12);background:rgba(255,255,255,.075);}
+  select.form-input,.search-bar,.status-sel{color-scheme:dark;appearance:auto;}
+  .form-input option,.search-bar option,.status-sel option{background:#0f2035;color:#fff;}
   .img-preview-wrap{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.5rem;}
   .img-prev{width:80px;height:80px;object-fit:cover;border:1px solid var(--border);cursor:pointer;position:relative;}
   .img-prev-del{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
@@ -116,9 +120,9 @@
   .drop-zone:hover{border-color:var(--gold);color:var(--gold);}
 
   /* SEARCH */
-  .search-bar{background:rgba(255,255,255,.04);border:1px solid var(--border);color:#fff;padding:.6rem 1rem;font-size:.85rem;outline:none;min-width:220px;}
+  .search-bar{background:rgba(255,255,255,.055);border:1px solid var(--border);border-radius:7px;color:#fff;padding:.68rem 2.3rem .68rem .9rem;font-size:.85rem;outline:none;min-width:220px;transition:border-color .2s,box-shadow .2s;}
   .search-bar::placeholder{color:rgba(255,255,255,.25);}
-  .search-bar:focus{border-color:var(--gold);}
+  .search-bar:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(191,150,99,.12);}
 
   /* RESPONSIVE */
   @media(max-width:768px){
@@ -144,7 +148,8 @@
   .toast.show{transform:translateY(0);}
 
   /* STATUS SELECT */
-  .status-sel{background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;padding:.35rem .6rem;font-size:.75rem;cursor:pointer;outline:none;}
+  .status-sel{background:rgba(255,255,255,.055);border:1px solid var(--border);border-radius:6px;color:#fff;padding:.42rem 1.8rem .42rem .6rem;font-size:.75rem;cursor:pointer;outline:none;transition:border-color .2s,box-shadow .2s;}
+  .status-sel:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(191,150,99,.12);}
 </style>
 </head>
 <body>
@@ -195,7 +200,7 @@
     <main>
       <div class="topbar">
         <h1 class="page-title" id="pageTitle">Dashboard</h1>
-        <div class="topbar-actions" id="topbarActions"></div>
+        <div class="topbar-tools"><div class="notification-wrap"><button class="notification-btn" onclick="toggleNotifications()" aria-label="Notificaciones"><i class="fa-regular fa-bell"></i><span class="notification-count" id="notificationCount">0</span></button><div class="notification-panel" id="notificationPanel"><div class="notification-title">Notificaciones</div><div id="notificationList"></div></div></div><div class="topbar-actions" id="topbarActions"></div></div>
       </div>
       <div class="content" id="mainContent">
 
@@ -620,6 +625,7 @@ function showPanel(name){
 // DASHBOARD
 // ══════════════════════════════════════
 function initDashboard(){
+  renderNotifications();
   const today=new Date().toDateString();
   const month=new Date().getMonth();
   const venHoy=sales.filter(s=>new Date(s.fecha).toDateString()===today&&s.estado!=='cancelado');
@@ -1029,6 +1035,15 @@ function deleteUser(id){
 // ══════════════════════════════════════
 // UTILS
 // ══════════════════════════════════════
+function toggleNotifications(){ document.getElementById('notificationPanel').classList.toggle('open'); renderNotifications(); }
+function renderNotifications(){
+  const alerts=[];
+  products.filter(p=>Number(p.stock||0)<=0).forEach(p=>alerts.push(`<div class="notification-item"><i class="fa-solid fa-box-open"></i><span><strong>${p.name}</strong><br>Producto agotado.</span></div>`));
+  products.filter(p=>Number(p.stock||0)>0&&Number(p.stock||0)<=3).forEach(p=>alerts.push(`<div class="notification-item"><i class="fa-solid fa-triangle-exclamation"></i><span><strong>${p.name}</strong><br>Stock bajo: ${p.stock} unidades.</span></div>`));
+  sales.filter(s=>s.estado==='pendiente').forEach(s=>alerts.push(`<div class="notification-item"><i class="fa-solid fa-clock"></i><span>Venta pendiente: <strong>${s.producto||'Sin producto'}</strong>.</span></div>`));
+  const list=document.getElementById('notificationList'), count=document.getElementById('notificationCount'); if(!list||!count) return;
+  list.innerHTML=alerts.length?alerts.join(''):'<div class="notification-empty">No tienes notificaciones nuevas.</div>'; count.textContent=alerts.length; count.style.display=alerts.length?'flex':'none';
+}
 function fmt(n){ return new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(n); }
 let adminToastTimer;
 function showAdminToast(msg){ const t=document.getElementById('adminToast'); clearTimeout(adminToastTimer); const isError=/no se pudo|obligatorio|completa|no puedes/i.test(msg); t.innerHTML=`<i class="fa-solid ${isError?'fa-circle-exclamation':'fa-circle-check'}" style="color:${isError?'var(--red)':'var(--green)'}"></i><span>${msg}</span>`; t.classList.add('show'); adminToastTimer=setTimeout(()=>t.classList.remove('show'),2800); }
