@@ -833,11 +833,19 @@ const { error } = await supabaseClient
   }]);
 
 console.log("SUPABASE ERROR:", error);
+console.log("PRODUCTO:", data);
+console.log("URL IMAGEN:", imageUrl);
+
 if(error){
-    alert("Error al guardar el producto:\n" + error.message);
+    console.log(error);
+    console.log(error.message);
+    console.log(error.details);
+    console.log(error.hint);
+
+    alert(error.message);
+
     return;
 }
-
 saveProducts();
 renderProductsTable();
 closeProductModal();
