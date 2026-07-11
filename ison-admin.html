@@ -150,6 +150,7 @@
   /* STATUS SELECT */
   .status-sel{background:rgba(255,255,255,.055);border:1px solid var(--border);border-radius:6px;color:#fff;padding:.42rem 1.8rem .42rem .6rem;font-size:.75rem;cursor:pointer;outline:none;transition:border-color .2s,box-shadow .2s;}
   .status-sel:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(191,150,99,.12);}
+  .sales-filter{position:relative;min-width:220px;}.sales-filter-btn{width:100%;background:#0f2035;border:1px solid var(--gold);border-radius:7px;color:#fff;padding:.68rem .9rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font:400 .85rem 'Jost',sans-serif;text-align:left;}.sales-filter-btn i{color:var(--gold);transition:transform .2s;}.sales-filter.open .sales-filter-btn i{transform:rotate(180deg);}.sales-filter-menu{position:absolute;top:calc(100% + .4rem);left:0;right:0;z-index:50;background:#0f2035;border:1px solid var(--border);border-radius:8px;padding:.35rem;box-shadow:0 16px 30px rgba(0,0,0,.35);display:none;}.sales-filter.open .sales-filter-menu{display:block;}.sales-filter-option{display:block;width:100%;border:0;border-radius:5px;background:transparent;color:var(--text-light);padding:.62rem .7rem;text-align:left;cursor:pointer;font:400 .82rem 'Jost',sans-serif;}.sales-filter-option:hover,.sales-filter-option.active{background:var(--gold-dim);color:var(--gold);}
 </style>
 </head>
 <body>
@@ -242,14 +243,12 @@
         <!-- VENTAS -->
         <div class="panel" id="panel-ventas">
           <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;">
-            <select class="search-bar" onchange="filterSales(this.value)" style="cursor:pointer;">
-              <option value="todos">Todos los estados</option>
-              <option value="pendiente">Pendiente</option>
-              <option value="pagado">Pagado</option>
-              <option value="enviado">Enviado</option>
-              <option value="entregado">Entregado</option>
-              <option value="cancelado">Cancelado</option>
-            </select>
+            <div class="sales-filter" id="salesFilter">
+              <button class="sales-filter-btn" type="button" onclick="toggleSalesFilter()"><span id="salesFilterLabel">Todos los estados</span><i class="fa-solid fa-chevron-down"></i></button>
+              <div class="sales-filter-menu">
+                <button class="sales-filter-option active" onclick="filterSales('todos')">Todos los estados</button><button class="sales-filter-option" onclick="filterSales('pendiente')">Pendiente</button><button class="sales-filter-option" onclick="filterSales('pagado')">Pagado</button><button class="sales-filter-option" onclick="filterSales('enviado')">Enviado</button><button class="sales-filter-option" onclick="filterSales('entregado')">Entregado</button><button class="sales-filter-option" onclick="filterSales('cancelado')">Cancelado</button>
+              </div>
+            </div>
           </div>
           <div class="table-wrap">
             <table>
@@ -856,7 +855,15 @@ function updateStock(id,val){
 function badgeClass(estado){
   return {pendiente:'badge-orange',pagado:'badge-green',enviado:'badge-gold',entregado:'badge-green',cancelado:'badge-red'}[estado]||'badge-gold';
 }
-function filterSales(f){ salesFilter=f; renderSales(); }
+function toggleSalesFilter(){ document.getElementById('salesFilter').classList.toggle('open'); }
+function filterSales(f){
+  salesFilter=f; renderSales();
+  const filter=document.getElementById('salesFilter'); if(!filter) return;
+  filter.classList.remove('open');
+  const labels={todos:'Todos los estados',pendiente:'Pendiente',pagado:'Pagado',enviado:'Enviado',entregado:'Entregado',cancelado:'Cancelado'};
+  document.getElementById('salesFilterLabel').textContent=labels[f]||labels.todos;
+  filter.querySelectorAll('.sales-filter-option').forEach(button=>button.classList.toggle('active',button.textContent.trim()===labels[f]));
+}
 function renderSales(){
   const list=salesFilter==='todos'?sales:sales.filter(s=>s.estado===salesFilter);
   document.getElementById('salesBody').innerHTML=list.length?list.slice().reverse().map(s=>`
