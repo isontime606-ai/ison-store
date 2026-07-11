@@ -806,10 +806,11 @@ async function checkoutCart(button){
   finally { setStoreButtonLoading(button,false); }
   const total=cart.reduce((sum,item)=>sum+(Number(item.precioDesc)>0?Number(item.precioDesc):Number(item.precio)||0)*item.qty,0);
   const invoiceNumber=registeredSales[0]?.id?.slice(0,8).toUpperCase()||Date.now().toString().slice(-8);
-  const date=new Date().toLocaleString('es-CO');
+  const purchaseDate=new Date();
+  const date=purchaseDate.toLocaleDateString('es-CO'), time=purchaseDate.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
   const list=cart.map(item=>{const unit=Number(item.precioDesc)>0?Number(item.precioDesc):Number(item.precio)||0;return `${item.qty} x ${item.name}\n   Ref: ${item.ref||'-'}\n   Unitario: ${fmt(unit)}\n   Subtotal: ${fmt(unit*item.qty)}`;}).join('\n\n');
   cart=[]; saveCart(); document.getElementById('cartPanel').classList.remove('open'); showToast('Compra registrada. Se abrirá WhatsApp...');
-  try { sendToStoreWhatsApp(`ISON — FACTURA DE PEDIDO\nFactura: ${invoiceNumber}\nFecha: ${date}\n\nDETALLE\n${list}\n\nTOTAL: ${fmt(total)}\n\nHola ISON, deseo confirmar este pedido. Quedo atento a las instrucciones de pago y envío.`,whatsAppTab); }
+  try { sendToStoreWhatsApp(`ISON — FACTURA DE PEDIDO\nFactura: ${invoiceNumber}\nFecha: ${date}\nHora: ${time}\n\nDETALLE\n${list}\n\nTOTAL: ${fmt(total)}\n\nHola ISON, deseo confirmar este pedido. Quedo atento a las instrucciones de pago y envío.`,whatsAppTab); }
   catch(error){ closeWhatsAppTab(whatsAppTab); showToast(error.message); }
 }
 function salePayload(p,quantity=1){
