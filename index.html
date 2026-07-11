@@ -799,6 +799,14 @@ function changeCartQty(id,delta){ const item=cart.find(i=>i.id===id), product=pr
 function removeFromCart(id){ cart=cart.filter(item=>item.id!==id); saveCart(); }
 function clearCart(){ if(!cart.length) return; cart=[]; saveCart(); showToast('Carrito vaciado'); }
 function toggleCart(){ document.getElementById('cartPanel').classList.toggle('open'); renderCart(); }
+function openWhatsAppTab(){ return window.open('about:blank','_blank'); }
+function closeWhatsAppTab(tab){ if(tab && !tab.closed) tab.close(); }
+function sendToStoreWhatsApp(message, tab){
+  const number=(cfg.whatsapp||WHATSAPP||'').replace(/\D/g,'');
+  if(!number) throw new Error('Configura el número de WhatsApp de la tienda.');
+  const url=`https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+  if(tab && !tab.closed) tab.location.replace(url); else window.location.href=url;
+}
 function renderCart(){
   const body=document.getElementById('cartItems'), subtotal=cart.reduce((sum,item)=>sum+(Number(item.precio)||0)*item.qty,0), total=cart.reduce((sum,item)=>sum+(Number(item.precioDesc)>0?Number(item.precioDesc):Number(item.precio)||0)*item.qty,0), saving=subtotal-total;
   body.innerHTML=cart.length?cart.map(item=>{const price=Number(item.precioDesc)>0?item.precioDesc:item.precio; return `<div class="cart-item"><img src="${item.img||''}" alt="${item.name}"><div><p class="cart-item-name">${item.name}</p><p class="cart-item-price">${fmt(price)}</p><div class="cart-qty"><button onclick="changeCartQty('${item.id}',-1)">−</button><span>${item.qty}</span><button onclick="changeCartQty('${item.id}',1)">+</button></div></div><button class="cart-remove" onclick="removeFromCart('${item.id}')" aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button></div>`;}).join(''):'<p class="cart-empty">Tu carrito está vacío.<br>Explora el catálogo y agrega tus favoritos.</p>';
@@ -806,11 +814,13 @@ function renderCart(){
 }
 async function checkoutCart(){
   if(!cart.length){ showToast('Tu carrito está vacío'); return; }
+  const whatsAppTab=openWhatsAppTab();
   try { for(const item of cart) for(let i=0;i<item.qty;i++) await registerWhatsAppSale(item); }
-  catch(error){ console.error('No se pudo confirmar la compra:',error); showToast(error.message||'No se pudo confirmar la compra'); return; }
+  catch(error){ closeWhatsAppTab(whatsAppTab); console.error('No se pudo confirmar la compra:',error); showToast(error.message||'No se pudo confirmar la compra'); return; }
   const total=cart.reduce((sum,item)=>sum+(Number(item.precioDesc)>0?Number(item.precioDesc):Number(item.precio)||0)*item.qty,0), list=cart.map(item=>`• ${item.qty} × ${item.name}`).join('\n');
   cart=[]; saveCart(); document.getElementById('cartPanel').classList.remove('open'); showToast('Compra registrada. Se abrirá WhatsApp...');
-  const num=(cfg.whatsapp||WHATSAPP).replace(/\D/g,''); window.open(`https://wa.me/${num}?text=${encodeURIComponent(`Hola ISON.\n\nQuiero confirmar esta compra:\n\n${list}\n\nTotal: ${fmt(total)}`)}`,'_blank');
+  try { sendToStoreWhatsApp(`Hola ISON.\n\nQuiero confirmar esta compra:\n\n${list}\n\nTotal: ${fmt(total)}`,whatsAppTab); }
+  catch(error){ closeWhatsAppTab(whatsAppTab); showToast(error.message); }
 }
 async function reserveStock(productId, quantity){
   for(let attempt=0;attempt<3;attempt++){
@@ -962,15 +972,13 @@ function closeModalOutside(e){ if(e.target===document.getElementById('modalOverl
 // WHATSAPP
 // ══════════════════════════════════════
 async function buyWhatsApp(p){
+  if(!p){ showToast('Selecciona un producto válido'); return; }
+  const whatsAppTab=openWhatsAppTab();
   try { await registerWhatsAppSale(p); }
-  catch(error){ console.error('No se pudo registrar la venta:',error); showToast(error.message || 'No se pudo registrar la venta.'); return; }
+  catch(error){ closeWhatsAppTab(whatsAppTab); console.error('No se pudo registrar la venta:',error); showToast(error.message || 'No se pudo registrar la venta.'); return; }
   showToast('Venta registrada. Se abrirá WhatsApp...');
-  // Open WhatsApp
-  const wa = cfg.whatsapp || WHATSAPP;
-  const num = wa.replace(/\D/g,'');
   const price = p.precioDesc>0?fmt(p.precioDesc):fmt(p.precio);
-  const msg = encodeURIComponent(
-`Hola ISON.
+  try { sendToStoreWhatsApp(`Hola ISON.
 
 Estoy interesado en el siguiente producto:
 
@@ -980,29 +988,24 @@ Marca: ${p.brand||'ISON'}
 Precio: ${price}
 
 Gracias.`
-  );
-  window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+  ,whatsAppTab); } catch(error){ closeWhatsAppTab(whatsAppTab); showToast(error.message); }
 }
 
 async function buyAllFavs(){
   if(favorites.length===0){ showToast('No tienes favoritos'); return; }
+  const whatsAppTab=openWhatsAppTab();
   try { for(const p of favorites) await registerWhatsAppSale(p); }
-  catch(error){ console.error('No se pudieron registrar las ventas:',error); showToast(error.message || 'No se pudieron registrar las ventas.'); return; }
+  catch(error){ closeWhatsAppTab(whatsAppTab); console.error('No se pudieron registrar las ventas:',error); showToast(error.message || 'No se pudieron registrar las ventas.'); return; }
   showToast('Ventas registradas. Se abrirá WhatsApp...');
-  const wa = cfg.whatsapp || WHATSAPP;
-  const num = wa.replace(/\D/g,'');
-  
   const total = favorites.reduce((s,p)=>s+(p.precioDesc>0?p.precioDesc:p.precio),0);
   const list=favorites.map(p=>`• ${p.name} (${fmt(p.precioDesc>0?p.precioDesc:p.precio)})`).join('\n');
-  const msg = encodeURIComponent(`Hola ISON.\n\nEstoy interesado en los siguientes productos:\n\n${list}\n\nTotal: ${fmt(total)}\n\nGracias.`);
-  window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+  try { sendToStoreWhatsApp(`Hola ISON.\n\nEstoy interesado en los siguientes productos:\n\n${list}\n\nTotal: ${fmt(total)}\n\nGracias.`,whatsAppTab); } catch(error){ closeWhatsAppTab(whatsAppTab); showToast(error.message); }
 }
 
 function sendContactWA(){
-  const wa = cfg.whatsapp || WHATSAPP;
-  const num = wa.replace(/\D/g,'');
-  const msg = encodeURIComponent('Hola ISON, me gustaría obtener más información sobre tus productos.');
-  window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+  const whatsAppTab=openWhatsAppTab();
+  try { sendToStoreWhatsApp('Hola ISON, me gustaría obtener más información sobre tus productos.',whatsAppTab); }
+  catch(error){ closeWhatsAppTab(whatsAppTab); showToast(error.message); }
 }
 
 // ══════════════════════════════════════
