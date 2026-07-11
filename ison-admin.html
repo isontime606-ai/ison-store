@@ -55,6 +55,8 @@
   .topbar{height:64px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;flex-shrink:0;gap:1rem;background:linear-gradient(90deg,rgba(15,32,53,.6),rgba(9,21,32,.32));}
   .page-title{font-family:"Cormorant Garamond",serif;font-size:1.4rem;font-weight:300;}
   .topbar-actions,.topbar-tools{display:flex;gap:.8rem;align-items:center;}
+  .admin-menu-toggle{display:none;width:38px;height:38px;align-items:center;justify-content:center;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:7px;color:var(--gold);cursor:pointer;flex-shrink:0;}
+  .admin-nav-backdrop{display:none;position:fixed;inset:0;z-index:790;background:rgba(0,0,0,.58);backdrop-filter:blur(2px);}
   .notification-wrap{position:relative;}.notification-btn{width:34px;height:34px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--gold);cursor:pointer;position:relative;border-radius:50%;}.notification-count{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;padding:0 4px;border-radius:10px;background:var(--red);color:#fff;font-size:.6rem;display:none;align-items:center;justify-content:center;}.notification-panel{position:absolute;top:44px;right:0;width:min(340px,calc(100vw - 2rem));background:#0f2035;border:1px solid var(--border);box-shadow:0 16px 38px rgba(0,0,0,.35);z-index:700;display:none;}.notification-panel.open{display:block;}.notification-title{padding:1rem 1.1rem;border-bottom:1px solid var(--border);font-size:.72rem;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;}.notification-item{display:flex;gap:.7rem;padding:.85rem 1.1rem;border-bottom:1px solid rgba(191,150,99,.08);font-size:.8rem;color:var(--text-light);}.notification-item:last-child{border-bottom:0;}.notification-item i{color:var(--orange);margin-top:.1rem;}.notification-empty{padding:1.2rem;color:var(--text-light);font-size:.82rem;text-align:center;}
   .notification-float{position:fixed;right:2rem;bottom:2rem;width:min(360px,calc(100vw - 2rem));z-index:1000;background:linear-gradient(135deg,#152b44,#0f2035);border:1px solid rgba(191,150,99,.5);border-radius:10px;padding:1rem 1.1rem;box-shadow:0 18px 42px rgba(0,0,0,.38);display:flex;gap:.8rem;align-items:flex-start;cursor:pointer;transform:translateY(130px);opacity:0;pointer-events:none;transition:transform .35s ease,opacity .35s ease;}.notification-float.show{transform:translateY(0);opacity:1;pointer-events:auto;}.notification-float i{color:var(--gold);font-size:1.05rem;margin-top:.15rem;}.notification-float strong{display:block;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:#fff;margin-bottom:.25rem;}.notification-float span{font-size:.78rem;color:var(--text-light);line-height:1.45;}
   .btn-sm{font-family:"Jost",sans-serif;font-size:.72rem;letter-spacing:.11em;text-transform:uppercase;padding:.62rem 1.15rem;cursor:pointer;border:1px solid transparent;border-radius:7px;transition:transform .2s,box-shadow .2s,background .2s;}
@@ -142,8 +144,31 @@
     .stats-grid{grid-template-columns:1fr 1fr;}
   }
   @media(max-width:600px){
-    aside{display:none;}
+    #app{height:100dvh;}
+    aside{display:flex;position:fixed;inset:0 auto 0 0;z-index:800;width:min(280px,86vw);transform:translateX(-105%);transition:transform .3s ease;box-shadow:18px 0 38px rgba(0,0,0,.35);padding-bottom:env(safe-area-inset-bottom);}
+    aside.mobile-open{transform:translateX(0);}
+    .admin-nav-backdrop.open{display:block;}
+    .admin-menu-toggle{display:inline-flex;}
+    main{width:100%;min-width:0;}
+    .topbar{height:auto;min-height:62px;padding:.65rem 1rem;align-items:center;}
+    .page-title{font-size:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .topbar-tools{gap:.45rem;min-width:0;}.topbar-actions{gap:.4rem;}
+    .topbar-actions .btn-sm{font-size:.62rem;padding:.55rem .7rem;letter-spacing:.06em;white-space:nowrap;}
+    .content{padding:1rem;}
     .stats-grid{grid-template-columns:1fr;}
+    .stat-card{padding:1.15rem;}.stat-val{font-size:1.9rem;}
+    .table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px;}
+    .table-wrap table{min-width:620px;}.panel#panel-productos table{min-width:980px;}.panel#panel-ventas table{min-width:960px;}.panel#panel-inventario table{min-width:640px;}
+    th{padding:.8rem .9rem;}td{padding:.7rem .9rem;}
+    .search-bar,.sales-filter{width:100%;min-width:0;}
+    .modal-bg{padding:0;align-items:flex-end;}
+    .modal-box{width:100%;max-height:94dvh;border-radius:14px 14px 0 0;}
+    .modal-header{padding:1rem 1.1rem;}.modal-body{padding:1rem;}.modal-footer{padding:1rem;gap:.55rem;position:sticky;bottom:0;background:#0f2035;}
+    .modal-footer .btn-sm{flex:1;padding:.75rem .6rem;}
+    .form-input{font-size:16px;min-height:44px;}.drop-zone{padding:1.1rem .8rem;}
+    .notification-panel{position:fixed;top:62px;left:1rem;right:1rem;width:auto;}
+    .notification-float{left:1rem;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom));width:auto;}
+    .login-box{padding:2rem 1.25rem;}.login-field{font-size:16px;}
   }
 
   /* TOGGLE */
@@ -181,9 +206,10 @@
 
 <!-- APP -->
 <div id="app">
+  <div class="admin-nav-backdrop" id="adminNavBackdrop" onclick="toggleAdminMenu(false)"></div>
   <div class="layout">
     <!-- SIDEBAR -->
-    <aside>
+    <aside id="adminSidebar">
       <div class="sidebar-logo">
         <img src="assets/ison-logo.png" alt="ISON">
         <span>Admin</span>
@@ -211,6 +237,7 @@
 
     <main>
       <div class="topbar">
+        <button class="admin-menu-toggle" onclick="toggleAdminMenu()" aria-label="Abrir menú de administración"><i class="fa-solid fa-bars"></i></button>
         <h1 class="page-title" id="pageTitle">Dashboard</h1>
         <div class="topbar-tools"><div class="notification-wrap"><button class="notification-btn" onclick="toggleNotifications()" aria-label="Notificaciones"><i class="fa-regular fa-bell"></i><span class="notification-count" id="notificationCount">0</span></button><div class="notification-panel" id="notificationPanel"><div class="notification-title">Notificaciones</div><div id="notificationList"></div></div></div><div class="topbar-actions" id="topbarActions"></div></div>
       </div>
@@ -615,6 +642,13 @@ const panelActions={
   cupones:`<button class="btn-sm btn-primary" onclick="openCouponModal()">+ Nuevo Cupón</button>`,
   usuarios:`<button class="btn-sm btn-primary" onclick="document.getElementById('userModalBg').classList.add('open')">+ Nuevo Usuario</button>`,
 };
+function toggleAdminMenu(force){
+  const sidebar=document.getElementById('adminSidebar'),backdrop=document.getElementById('adminNavBackdrop');
+  if(!sidebar||!backdrop) return;
+  const open=typeof force==='boolean'?force:!sidebar.classList.contains('mobile-open');
+  sidebar.classList.toggle('mobile-open',open);
+  backdrop.classList.toggle('open',open);
+}
 function showPanel(name){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -629,6 +663,7 @@ function showPanel(name){
   if(name==='cupones') renderCoupons();
   if(name==='usuarios') renderUsers();
   if(name==='config') loadConfig();
+  if(window.innerWidth<=600) toggleAdminMenu(false);
 }
 
 // ══════════════════════════════════════

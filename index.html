@@ -71,7 +71,7 @@
     background: rgba(255,255,255,0.06);
     border:1px solid rgba(191,150,99,0.25);
     color: var(--white);
-    padding:.45rem 1rem .45rem 2.2rem;
+    padding:.45rem 1rem;
     border-radius:40px;
     font-family:'Jost',sans-serif;
     font-size:.8rem;
@@ -80,8 +80,6 @@
     outline:none;
   }
   .search-wrap.open .search-input { width:200px; opacity:1; }
-  .search-icon-label { position:absolute; left:.6rem; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--gold); font-size:.85rem; }
-
   /* HAMBURGER */
   .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none; padding:.3rem; }
   .hamburger span { width:22px; height:1.5px; background:var(--gold); display:block; transition:all .3s; }
@@ -475,6 +473,9 @@
   @media(max-width:900px) {
     nav { display:none; }
     .hamburger { display:flex; }
+    header{padding:0 1.5rem;}
+    .hero-content{padding-left:1.5rem;padding-right:1.5rem;}
+    .hero-title{font-size:clamp(2.7rem,10vw,5rem);}
     .modal-inner { grid-template-columns:1fr; }
     .modal-gallery .modal-thumbs { display:flex; }
     .about-grid { grid-template-columns:1fr; }
@@ -482,14 +483,42 @@
     .footer-grid { grid-template-columns:1fr 1fr; }
   }
   @media(max-width:600px) {
-    header { padding:0 1.2rem; }
-    .container { padding:0 1.2rem; }
-    section { padding:3.5rem 0; }
+    header { height:64px;padding:0 1rem; }
+    .logo-wrap img{height:29px;max-width:110px;}
+    .header-actions{gap:.55rem;}
+    .icon-btn{font-size:1.05rem;padding:.25rem;}
+    .search-input{position:fixed;top:64px;left:1rem;right:1rem;z-index:101;height:0;width:calc(100vw - 2rem);padding:0 1rem;background:#0f2035;border-color:transparent;box-shadow:0 12px 25px rgba(0,0,0,.28);}
+    .search-wrap.open .search-input{width:calc(100vw - 2rem);height:44px;opacity:1;border-color:rgba(191,150,99,.35);}
+    .mobile-nav{gap:1.7rem;padding:5rem 1.5rem 2rem;overflow-y:auto;}
+    .mobile-nav a{font-size:1.65rem;}
+    .hero-content{padding:7rem 1rem 3rem;}
+    .hero-eyebrow{letter-spacing:.25em;font-size:.64rem;}
+    .hero-title{font-size:clamp(2.35rem,13vw,3.6rem);}
+    .hero-subtitle{font-size:.9rem;line-height:1.7;}
+    .hero-line-1{width:110vw;height:110vw;}.hero-line-2{width:155vw;height:155vw;}
+    .container { padding:0 1rem; }
+    section { padding:3.25rem 0; }
+    .section-title{font-size:clamp(2rem,10vw,2.7rem);}
+    .catalog-controls{gap:1rem;align-items:stretch;}
+    .catalog-search{width:100%;}.catalog-search input{width:100%;}
+    .filters{display:flex;overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;padding-bottom:.35rem;scrollbar-width:none;}
+    .filters::-webkit-scrollbar{display:none;}.filter-btn{flex:0 0 auto;padding:.65rem 1.2rem;}
     .footer-grid { grid-template-columns:1fr; gap:2rem; }
-    .products-grid { grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:1.5rem; }
+    .products-grid { grid-template-columns:1fr; gap:1.25rem; }
+    .card{max-width:430px;width:100%;margin:0 auto;}
+    .card-img-wrap{aspect-ratio:1/1;}
     .card-body { padding:1.4rem 1.2rem; }
     .card-name { font-size:1rem; }
-    .btn-buy { padding:.7rem; font-size:.7rem; }
+    .card-actions{padding:0 1.2rem 1.2rem!important;}.btn-buy { min-height:44px;padding:.8rem; font-size:.7rem; }
+    .modal-overlay{padding:0;align-items:flex-end;}.modal-inner{width:100%;max-height:94dvh;border-radius:14px 14px 0 0;overflow-y:auto;}
+    .modal-gallery{padding:1rem;}.modal-info{padding:1.5rem 1.2rem 2rem;}.modal-main-img{max-height:48vh;object-fit:contain;}
+    .modal-thumbs{overflow-x:auto;padding-bottom:.3rem;}.modal-thumbs img{flex:0 0 auto;}
+    .about-title{font-size:2rem;}.about-text{line-height:1.75;}.contact-grid{gap:2.5rem;}
+    .form-input{font-size:16px;min-height:46px;}.contact-form .btn-primary{width:100%;justify-content:center;}
+    .fav-panel,.cart-panel{width:100%;}.fav-panel-header{padding:1rem 1.2rem;}.fav-panel-footer,.cart-summary{padding:1rem 1.2rem calc(1rem + env(safe-area-inset-bottom));}
+    .cart-items{padding:.5rem 1rem;}.cart-item{grid-template-columns:56px 1fr auto;gap:.65rem;}.cart-item img{width:56px;height:56px;}
+    footer{padding-top:2.5rem;}.footer-grid{text-align:center;}.footer-brand-text{margin-inline:auto;}.footer-socials{justify-content:center;}
+    .toast{max-width:calc(100vw - 2rem);width:max-content;white-space:normal;text-align:center;bottom:calc(1rem + env(safe-area-inset-bottom));}
   }
   .no-products { text-align:center; color:var(--text-light); padding:4rem; grid-column:1/-1; }
 </style>
@@ -509,7 +538,6 @@
   </nav>
   <div class="header-actions">
     <div class="search-wrap" id="searchWrap">
-      <span class="search-icon-label"><i class="fa-solid fa-magnifying-glass"></i></span>
       <input class="search-input" id="headerSearch" placeholder="Buscar reloj..." oninput="liveSearch(this.value)">
       <button class="icon-btn" onclick="toggleSearch()" title="Buscar" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
     </div>
