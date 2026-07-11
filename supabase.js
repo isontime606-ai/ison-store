@@ -24,12 +24,15 @@ function normalizeProduct(p) {
 }
 
 function normalizeSale(s) {
+  const statusMap = { Pendiente:'pendiente', Pagada:'pagado', Enviada:'enviado', Entregada:'entregado', Cancelada:'cancelado' };
   return {
     ...s,
     id: String(s.id),
-    productoId: s.productoId == null ? '' : String(s.productoId),
+    fecha: s.fecha || s.created_at,
+    productoId: String(s.productoId ?? s.producto_id ?? ''),
     cantidad: Number(s.cantidad) || 1,
-    total: Number(s.total) || 0
+    total: Number(s.total) || 0,
+    estado: statusMap[s.estado] || String(s.estado || 'pendiente').toLowerCase()
   };
 }
 
@@ -98,27 +101,76 @@ async function deleteUnusedProductImages(urls) {
 }
 
 async function createSaleWithStock(sale) {
-  const { data, error } = await supabaseClient.rpc('create_sale_with_stock', { sale_data: sale });
-  if (error) throw error;
-  return normalizeSale(data);
+  const productId=sale.productoId ?? sale.producto_id;
+  const quantity=Math.max(1,Number(sale.cantidad)||1);
+  const {data:product,error:readError}=await supabaseClient.from('products').select('id,name,stock,price,preciodesc').eq('id',productId).single();
+  if(readError) throw readError;
+  const previousStock=Number(product.stock)||0;
+  const requestedStatus={pendiente:'Pendiente',pagado:'Pagada',enviado:'Enviada',entregado:'Entregada',cancelado:'Cancelada'}[String(sale.estado||'pendiente').toLowerCase()]||'Pendiente';
+  if(requestedStatus!=='Cancelada'&&previousStock<quantity) throw new Error(`Stock insuficiente para ${product.name}.`);
+  const unitPrice=Number(sale.precio_unitario ?? (Number(product.preciodesc)>0?product.preciodesc:product.price))||0;
+  const row={producto_id:Number(product.id),producto:product.name,cantidad:quantity,precio_unitario:unitPrice,total:Number(sale.total)||unitPrice*quantity,estado:requestedStatus};
+  const {data:inserted,error:insertError}=await supabaseClient.from('sales').insert(row).select('*').single();
+  if(insertError) throw insertError;
+  const nextStock=requestedStatus==='Cancelada'?previousStock:previousStock-quantity;
+  if(nextStock===previousStock) return normalizeSale(inserted);
+  const {data:updated,error:updateError}=await supabaseClient.from('products').update({stock:nextStock}).eq('id',product.id).eq('stock',previousStock).select('id').maybeSingle();
+  if(updateError || !updated){
+    await supabaseClient.from('sales').delete().eq('id',inserted.id);
+    throw updateError || new Error('El inventario cambió. Intenta nuevamente.');
+  }
+  return normalizeSale(inserted);
 }
 
 async function createSalesWithStock(sales) {
-  const { data, error } = await supabaseClient.rpc('create_sales_with_stock', { sales_data: sales });
-  if (error) throw error;
-  return (data || []).map(normalizeSale);
+  const created=[];
+  for(const sale of sales) created.push(await createSaleWithStock(sale));
+  return created;
 }
 
 async function changeSaleStatusWithStock(id, status) {
-  const { data, error } = await supabaseClient.rpc('change_sale_status_with_stock', {
-    sale_id: String(id),
-    new_status: status
-  });
-  if (error) throw error;
-  return normalizeSale(data);
+  const dbStatus={pendiente:'Pendiente',pagado:'Pagada',enviado:'Enviada',entregado:'Entregada',cancelado:'Cancelada'}[status];
+  if(!dbStatus) throw new Error('Estado inválido.');
+  const {data:rawSale,error:readError}=await supabaseClient.from('sales').select('*').eq('id',id).single();
+  if(readError) throw readError;
+  const sale=normalizeSale(rawSale);
+  if(sale.estado===status) return sale;
+  const {data:product,error:productError}=await supabaseClient.from('products').select('id,stock').eq('id',sale.productoId).single();
+  if(productError) throw productError;
+  const previousStock=Number(product.stock)||0;
+  let nextStock=previousStock;
+  if(sale.estado!=='cancelado'&&status==='cancelado') nextStock+=sale.cantidad;
+  if(sale.estado==='cancelado'&&status!=='cancelado'){
+    if(previousStock<sale.cantidad) throw new Error('Stock insuficiente para reactivar la venta.');
+    nextStock-=sale.cantidad;
+  }
+  if(nextStock!==previousStock){
+    const {data:stockUpdated,error:stockError}=await supabaseClient.from('products').update({stock:nextStock}).eq('id',product.id).eq('stock',previousStock).select('id').maybeSingle();
+    if(stockError || !stockUpdated) throw stockError || new Error('El inventario cambió. Intenta nuevamente.');
+  }
+  const {data:updatedSale,error:updateError}=await supabaseClient.from('sales').update({estado:dbStatus}).eq('id',id).select('*').single();
+  if(updateError){
+    if(nextStock!==previousStock) await supabaseClient.from('products').update({stock:previousStock}).eq('id',product.id).eq('stock',nextStock);
+    throw updateError;
+  }
+  return normalizeSale(updatedSale);
 }
 
 async function deleteSaleWithStock(id) {
-  const { error } = await supabaseClient.rpc('delete_sale_with_stock', { sale_id: String(id) });
-  if (error) throw error;
+  const {data:rawSale,error:readError}=await supabaseClient.from('sales').select('*').eq('id',id).single();
+  if(readError) throw readError;
+  const sale=normalizeSale(rawSale);
+  let product=null,previousStock=0,nextStock=0;
+  if(sale.estado!=='cancelado'){
+    const result=await supabaseClient.from('products').select('id,stock').eq('id',sale.productoId).single();
+    if(result.error) throw result.error;
+    product=result.data; previousStock=Number(product.stock)||0; nextStock=previousStock+sale.cantidad;
+    const {data,error}=await supabaseClient.from('products').update({stock:nextStock}).eq('id',product.id).eq('stock',previousStock).select('id').maybeSingle();
+    if(error || !data) throw error || new Error('El inventario cambió. Intenta nuevamente.');
+  }
+  const {data:deleted,error:deleteError}=await supabaseClient.from('sales').delete().eq('id',id).select('id').maybeSingle();
+  if(deleteError || !deleted){
+    if(product) await supabaseClient.from('products').update({stock:previousStock}).eq('id',product.id).eq('stock',nextStock);
+    throw deleteError || new Error('No se pudo eliminar la venta.');
+  }
 }

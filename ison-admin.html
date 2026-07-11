@@ -545,7 +545,7 @@ window.addEventListener('load', async () => {
 
     const [productResult, saleResult] = await Promise.all([
       supabaseClient.from('products').select('*').order('name'),
-      supabaseClient.from('sales').select('*').order('fecha')
+      supabaseClient.from('sales').select('*').order('created_at')
     ]);
     if(productResult.error) console.error('Error cargando productos:', productResult.error);
     else products = (productResult.data || []).map(normalizeProduct);
@@ -919,7 +919,7 @@ function renderSales(){
 async function reloadCommerceData(){
   const [productResult,saleResult]=await Promise.all([
     supabaseClient.from('products').select('*').order('name'),
-    supabaseClient.from('sales').select('*').order('fecha')
+    supabaseClient.from('sales').select('*').order('created_at')
   ]);
   if(productResult.error) throw productResult.error;
   if(saleResult.error) throw saleResult.error;

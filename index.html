@@ -814,7 +814,8 @@ async function checkoutCart(button){
   catch(error){ closeWhatsAppTab(whatsAppTab); showToast(error.message); }
 }
 function salePayload(p,quantity=1){
-  return {id:crypto.randomUUID(),fecha:new Date().toISOString(),productoId:p.id,producto:p.name,cantidad:quantity,cliente:'',ciudad:'',telefono:'',canal:'whatsapp',estado:'pendiente',total:(p.precioDesc>0?p.precioDesc:p.precio)*quantity};
+  const unitPrice=Number(p.precioDesc)>0?Number(p.precioDesc):Number(p.precio)||0;
+  return {producto_id:Number(p.id),producto:p.name,cantidad:quantity,precio_unitario:unitPrice,total:unitPrice*quantity,estado:'Pendiente'};
 }
 async function registerSalesWithStock(items){
   const quantities=new Map();
@@ -832,8 +833,9 @@ async function registerSalesWithStock(items){
     return salePayload(localProduct,quantity);
   });
 
-  const {error:insertError}=await supabaseClient.from('sales').insert(sales);
+  const {data:insertedSales,error:insertError}=await supabaseClient.from('sales').insert(sales).select('id,created_at');
   if(insertError) throw insertError;
+  if(!insertedSales || insertedSales.length!==sales.length) throw new Error('Supabase no confirmó el registro completo de la venta.');
 
   const updated=[];
   try {
@@ -848,9 +850,9 @@ async function registerSalesWithStock(items){
       const local=products.find(item=>item.id===String(product.id));
       if(local) local.stock=nextStock;
     }
-    return sales.map(normalizeSale);
+    return sales.map((sale,index)=>({...sale,id:String(insertedSales[index].id),created_at:insertedSales[index].created_at}));
   }catch(error){
-    const saleIds=sales.map(sale=>sale.id);
+    const saleIds=insertedSales.map(sale=>sale.id);
     const {error:deleteError}=await supabaseClient.from('sales').delete().in('id',saleIds);
     if(deleteError) console.error('No se pudo revertir la venta:',deleteError);
     for(const product of updated){
