@@ -1071,6 +1071,7 @@ filterProducts();
 
 // Listen for storage changes (admin updates)
 window.addEventListener('storage', e=>{
+  if(e.key==='ison_products_updated') loadProductsFromSupabase();
   if(e.key==='ison_config'){
     const nc=JSON.parse(e.newValue||'{}');
     if(nc.bannerTitle) document.getElementById('bannerTitle').innerHTML=nc.bannerTitle;

@@ -842,11 +842,23 @@ function renderInventory(){
     </tr>
   `).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--text-light);padding:2rem;">Sin productos</td></tr>';
 }
-function updateStock(id,val){
+async function updateStock(id,val){
   const p=products.find(x=>x.id===id);
   if(!p) return;
-  p.stock=Math.max(0,parseInt(val)||0);
-  saveProducts(); renderInventory(); showAdminToast('Stock actualizado');
+  const previousStock=Number(p.stock)||0;
+  const stock=Math.max(0,parseInt(val)||0);
+  if(stock===previousStock) return;
+  p.stock=stock; renderInventory();
+  const {error}=await supabaseClient.from('products').update({stock}).eq('id',id);
+  if(error){
+    p.stock=previousStock; renderInventory();
+    showAdminToast('No se pudo guardar el stock: '+error.message);
+    return;
+  }
+  renderProductsTable(); renderNotifications();
+  // Señal entre pestañas como respaldo si Realtime aún no está habilitado en Supabase.
+  localStorage.setItem('ison_products_updated',String(Date.now()));
+  showAdminToast('Stock actualizado');
 }
 
 // ══════════════════════════════════════
