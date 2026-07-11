@@ -9,8 +9,10 @@ const supabaseClient = window.supabase.createClient(
  * Reduce mucho el peso sin perder calidad visible.
  */
 async function compressImage(file, maxWidth = 1200, quality = 0.75) {
-
-  return new Promise((resolve) => {
+  if (!file || !file.type.startsWith('image/')) {
+    throw new Error('Selecciona una imagen válida.');
+  }
+  return new Promise((resolve, reject) => {
 
     const img = new Image();
 
@@ -33,6 +35,7 @@ async function compressImage(file, maxWidth = 1200, quality = 0.75) {
       ctx.drawImage(img, 0, 0, width, height);
 
       canvas.toBlob((blob) => {
+        if (!blob) { reject(new Error('No fue posible comprimir la imagen.')); return; }
 
         resolve(
           new File(
@@ -48,7 +51,10 @@ async function compressImage(file, maxWidth = 1200, quality = 0.75) {
 
     };
 
-    img.src = URL.createObjectURL(file);
+    img.onerror = () => reject(new Error('No fue posible leer la imagen.'));
+    const objectUrl = URL.createObjectURL(file);
+    img.onloadend = () => URL.revokeObjectURL(objectUrl);
+    img.src = objectUrl;
 
   });
 
@@ -60,16 +66,9 @@ async function compressImage(file, maxWidth = 1200, quality = 0.75) {
  * y devuelve la URL pública.
  */
 async function uploadImage(file) {
-
-  try {
-
     const compressed = await compressImage(file);
-
-    const fileName =
-      Date.now() +
-      "_" +
-      Math.random().toString(36).substring(2,8) +
-      ".jpg";
+    const digest = await crypto.subtle.digest('SHA-256', await compressed.arrayBuffer());
+    const fileName = 'products/' + Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2,'0')).join('') + '.jpg';
 
     const { error } = await supabaseClient.storage
       .from("products")
@@ -78,26 +77,14 @@ async function uploadImage(file) {
         upsert: false
       });
 
-    if (error) {
-
-      console.error("ERROR SUBIENDO:", error);
-      return null;
-
-    }
+    if (error && !/already exists|duplicate/i.test(error.message)) throw error;
 
     const { data } = supabaseClient.storage
       .from("products")
       .getPublicUrl(fileName);
 
+    if (!data || !data.publicUrl) throw new Error('Storage no devolvió una URL pública.');
     return data.publicUrl;
-
-  }
-  catch(err){
-
-    console.error(err);
-    return null;
-
-  }
 
 }
 

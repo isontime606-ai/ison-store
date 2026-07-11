@@ -140,7 +140,7 @@
   input:checked+.slider:before{transform:translateX(18px);}
 
   /* TOAST */
-  .toast{position:fixed;bottom:2rem;right:2rem;background:#0f2035;border:1px solid var(--gold);color:#fff;padding:.8rem 1.5rem;font-size:.82rem;z-index:999;transform:translateY(100px);transition:transform .3s;letter-spacing:.05em;}
+  .toast{position:fixed;bottom:2rem;right:2rem;background:#0f2035;border:1px solid var(--gold);color:#fff;padding:.9rem 1.2rem;font-size:.82rem;z-index:999;transform:translateY(120px);transition:transform .3s,opacity .3s;letter-spacing:.03em;display:flex;align-items:center;gap:.7rem;box-shadow:0 14px 35px rgba(0,0,0,.3);border-radius:8px;max-width:min(380px,calc(100vw - 2rem));}
   .toast.show{transform:translateY(0);}
 
   /* STATUS SELECT */
@@ -496,7 +496,7 @@
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="adminToast"></div>
+<div class="toast" id="adminToast" role="status" aria-live="polite"></div>
 
 <script>
 // ══════════════════════════════════════
@@ -754,46 +754,21 @@ function setMainFromGallery(src){
   document.getElementById('mainImgPreview').innerHTML=`<div style="position:relative;"><img src="${src}" style="width:80px;height:80px;object-fit:cover;border:1px solid var(--border);border-radius:4px;"><button type="button" class="img-prev-del" onclick="document.getElementById('pImg').value='';previewMainImg();" aria-label="Quitar imagen"><i class="fa-solid fa-xmark"></i></button></div>`;
   document.getElementById('pImg').dataset.base64=src;
 }
-function saveProduct(){
+async function saveProduct(){
   const name=document.getElementById('pNombre').value.trim();
   if(!name){ showAdminToast('El nombre es obligatorio'); return; }
-  const mainImgBase64=document.getElementById('pImg').dataset.base64||'';
-  const imgs=[];
-  const galleryFiles=document.getElementById('pImgs').files;
-  let galleryProcessed=0;
-  if(galleryFiles.length===0){
-    finalizeSaveProduct(mainImgBase64,[]);
-  }else{
-    Array.from(galleryFiles).forEach(file=>{
-      const reader=new FileReader();
-      reader.onload=e=>{
-        imgs.push(e.target.result);
-        galleryProcessed++;
-        if(galleryProcessed===galleryFiles.length) finalizeSaveProduct(mainImgBase64,imgs);
-      };
-      reader.readAsDataURL(file);
-    });
-  }
+  try { await finalizeSaveProduct(); }
+  catch(error){ console.error('Error guardando producto:',error); showAdminToast('No se pudo guardar: '+error.message); }
 }
-async function finalizeSaveProduct(mainImg,galleryImgs){
-  let imageUrl = mainImg;
-
-  const mainFile = document.getElementById('pImg').files[0];
-
-  if(mainFile){
-    const uploadedUrl = await uploadImage(mainFile);
-
-    if(uploadedUrl){
-      imageUrl = uploadedUrl;
-    }
-  }
-
- const imgs = [
-    ...(imageUrl ? [imageUrl] : []),
-    ...galleryImgs
-];
+async function finalizeSaveProduct(){
+  const previous=editingProductId ? products.find(p=>p.id===editingProductId) : null;
+  const mainFile=document.getElementById('pImg').files[0];
+  const galleryFiles=Array.from(document.getElementById('pImgs').files);
+  const imageUrl=mainFile ? await uploadImage(mainFile) : (previous?.img || '');
+  const galleryUrls=galleryFiles.length ? await uploadGalleryImages(galleryFiles) : (previous?.imgs || []).filter(url=>url!==previous?.img);
+  const imgs=[...new Set([imageUrl,...galleryUrls].filter(Boolean))];
   const data={
-    id: editingProductId||'p'+Date.now(),
+    id: editingProductId,
     name:document.getElementById('pNombre').value.trim(),
     ref:document.getElementById('pRef').value.trim(),
     brand:document.getElementById('pMarca').value.trim()||'ISON',
@@ -809,13 +784,7 @@ async function finalizeSaveProduct(mainImg,galleryImgs){
     imgs,
     visible:document.getElementById('pVisible').checked
   };
-  if(editingProductId){ const i=products.findIndex(x=>x.id===editingProductId); if(i>=0) products[i]=data; }
-  else products.push(data);
-  console.log("PRODUCTO A GUARDAR:", data);
-
-const { error } = await supabaseClient
-  .from('products')
-  .insert([{
+  const row={
     name: data.name,
     description: data.descripcion,
     price: data.precio,
@@ -829,29 +798,15 @@ const { error } = await supabaseClient
     material: data.material,
     color: data.color,
     garantia: data.garantia,
-    visible: data.visible
-  }]);
-
-console.log("SUPABASE ERROR:", error);
-console.log("PRODUCTO:", data);
-console.log("URL IMAGEN:", imageUrl);
-
-if(error){
-    console.log(error);
-    console.log(error.message);
-    console.log(error.details);
-    console.log(error.hint);
-
-    alert(error.message);
-
-    return;
-}
-saveProducts();
-renderProductsTable();
-closeProductModal();
-showAdminToast("Producto guardado correctamente");
-
-// saveProducts();
+    visible: data.visible,
+    image_urls: galleryUrls
+  };
+  const request=editingProductId ? supabaseClient.from('products').update(row).eq('id',editingProductId) : supabaseClient.from('products').insert(row);
+  const {data: saved,error}=await request.select().single();
+  if(error) throw error;
+  const product={...data,...saved,img:saved.image_url||saved.image||data.img,imgs:[...new Set([saved.image_url||saved.image||data.img,...(saved.image_urls||galleryUrls)].filter(Boolean))]};
+  const index=products.findIndex(p=>p.id===product.id); if(index>=0) products[index]=product; else products.unshift(product);
+  renderProductsTable(); closeProductModal(); showAdminToast('Producto guardado correctamente');
 }
 function deleteProduct(id){
   if(!confirm('¿Eliminar este producto?')) return;
@@ -1075,7 +1030,8 @@ function deleteUser(id){
 // UTILS
 // ══════════════════════════════════════
 function fmt(n){ return new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(n); }
-function showAdminToast(msg){ const t=document.getElementById('adminToast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+let adminToastTimer;
+function showAdminToast(msg){ const t=document.getElementById('adminToast'); clearTimeout(adminToastTimer); const isError=/no se pudo|obligatorio|completa|no puedes/i.test(msg); t.innerHTML=`<i class="fa-solid ${isError?'fa-circle-exclamation':'fa-circle-check'}" style="color:${isError?'var(--red)':'var(--green)'}"></i><span>${msg}</span>`; t.classList.add('show'); adminToastTimer=setTimeout(()=>t.classList.remove('show'),2800); }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
