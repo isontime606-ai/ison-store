@@ -788,9 +788,7 @@ function toggleCart(){ document.getElementById('cartPanel').classList.toggle('op
 function openWhatsAppTab(){ return window.open('about:blank','_blank'); }
 function closeWhatsAppTab(tab){ if(tab && !tab.closed) tab.close(); }
 function sendToStoreWhatsApp(message, tab){
-  const number=(cfg.whatsapp||WHATSAPP||'').replace(/\D/g,'');
-  if(!number) throw new Error('Configura el número de WhatsApp de la tienda.');
-  const url=`https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+  const url=`https://wa.me/573128447044?text=${encodeURIComponent(message)}`;
   if(tab && !tab.closed) tab.location.replace(url); else window.location.href=url;
 }
 function renderCart(){
@@ -817,8 +815,54 @@ async function checkoutCart(button){
 function salePayload(p,quantity=1){
   return {id:crypto.randomUUID(),fecha:new Date().toISOString(),productoId:p.id,producto:p.name,cantidad:quantity,cliente:'',ciudad:'',telefono:'',canal:'whatsapp',estado:'pendiente',total:(p.precioDesc>0?p.precioDesc:p.precio)*quantity};
 }
-async function registerWhatsAppSale(p,quantity=1){ return createSaleWithStock(salePayload(p,quantity)); }
-async function registerCartSales(items){ return createSalesWithStock(items.map(item=>salePayload(item,item.qty))); }
+async function registerSalesWithStock(items){
+  const quantities=new Map();
+  items.forEach(item=>quantities.set(String(item.id),(quantities.get(String(item.id))||0)+(Number(item.qty)||1)));
+  const productIds=[...quantities.keys()];
+  const {data:currentProducts,error:readError}=await supabaseClient.from('products').select('id,name,stock,price,preciodesc,ref').in('id',productIds);
+  if(readError) throw readError;
+  if((currentProducts||[]).length!==productIds.length) throw new Error('Uno de los productos ya no está disponible.');
+
+  const sales=(currentProducts||[]).map(product=>{
+    const quantity=quantities.get(String(product.id));
+    const stock=Number(product.stock)||0;
+    if(stock<quantity) throw new Error(`Stock insuficiente para ${product.name}.`);
+    const localProduct=products.find(item=>item.id===String(product.id))||normalizeProduct(product);
+    return salePayload(localProduct,quantity);
+  });
+
+  const {error:insertError}=await supabaseClient.from('sales').insert(sales);
+  if(insertError) throw insertError;
+
+  const updated=[];
+  try {
+    for(const product of currentProducts){
+      const quantity=quantities.get(String(product.id));
+      const previousStock=Number(product.stock)||0;
+      const nextStock=previousStock-quantity;
+      const {data,error}=await supabaseClient.from('products').update({stock:nextStock}).eq('id',product.id).eq('stock',previousStock).select('id,stock').maybeSingle();
+      if(error) throw error;
+      if(!data) throw new Error(`El inventario de ${product.name} cambió. Intenta nuevamente.`);
+      updated.push({id:product.id,previousStock,nextStock});
+      const local=products.find(item=>item.id===String(product.id));
+      if(local) local.stock=nextStock;
+    }
+    return sales.map(normalizeSale);
+  }catch(error){
+    const saleIds=sales.map(sale=>sale.id);
+    const {error:deleteError}=await supabaseClient.from('sales').delete().in('id',saleIds);
+    if(deleteError) console.error('No se pudo revertir la venta:',deleteError);
+    for(const product of updated){
+      const {error:rollbackError}=await supabaseClient.from('products').update({stock:product.previousStock}).eq('id',product.id).eq('stock',product.nextStock);
+      if(rollbackError) console.error('No se pudo revertir el stock:',rollbackError);
+      const local=products.find(item=>item.id===String(product.id));
+      if(local) local.stock=product.previousStock;
+    }
+    throw error;
+  }
+}
+async function registerWhatsAppSale(p,quantity=1){ return (await registerSalesWithStock([{...p,qty:quantity}]))[0]; }
+async function registerCartSales(items){ return registerSalesWithStock(items); }
 
 // Load config from admin
 const cfg = JSON.parse(localStorage.getItem('ison_config') || '{}');
@@ -980,7 +1024,7 @@ Quedo atento a las instrucciones de pago y envío. Gracias.`
 async function buyAllFavs(){
   if(favorites.length===0){ showToast('No tienes favoritos'); return; }
   const whatsAppTab=openWhatsAppTab();
-  try { await createSalesWithStock(favorites.map(p=>salePayload(p,1))); }
+  try { await registerSalesWithStock(favorites.map(p=>({...p,qty:1}))); }
   catch(error){ closeWhatsAppTab(whatsAppTab); console.error('No se pudieron registrar las ventas:',error); showToast(error.message || 'No se pudieron registrar las ventas.'); return; }
   showToast('Ventas registradas. Se abrirá WhatsApp...');
   const total = favorites.reduce((s,p)=>s+(p.precioDesc>0?p.precioDesc:p.precio),0);
