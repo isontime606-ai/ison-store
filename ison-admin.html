@@ -553,11 +553,7 @@ let removeCurrentMainImage = false;
 let salesFilter = 'todos';
 let productSearch = '';
 
-const users = JSON.parse(localStorage.getItem('ison_users')||JSON.stringify([
-  {id:'u1',user:'admin',pass:'ison2000',rol:'admin'},
-  {id:'u2',user:'vendedor',pass:'ison2000',rol:'vendedor'}
-]));
-function saveUsers(){ localStorage.setItem('ison_users',JSON.stringify(users)); }
+let users = [];
 
 let products = [];
 let sales = [];
@@ -569,6 +565,14 @@ const cfg = JSON.parse(localStorage.getItem('ison_config')||'{}');
 window.addEventListener('load', async () => {
 
     if(!currentUser) return;
+
+    const {data:session,error:sessionError}=await supabaseClient.rpc('validate_admin_session',{session_token:currentUser.token});
+    if(sessionError || !session){
+      localStorage.removeItem('ison_session');
+      currentUser=null;
+      return;
+    }
+    currentUser={...session,token:currentUser.token};
 
     const [productResult, saleResult] = await Promise.all([
       supabaseClient.from('products').select('*').order('name'),
@@ -603,13 +607,13 @@ window.addEventListener('load', async () => {
 async function doLogin(){
   const u=document.getElementById('loginUser').value.trim();
   const p=document.getElementById('loginPass').value.trim();
-  const found=users.find(x=>x.user===u&&x.pass===p);
-  if(!found){ document.getElementById('loginErr').style.display='block'; return; }
+  const loginErr=document.getElementById('loginErr');
+  loginErr.style.display='none';
+  if(!u||!p){ loginErr.textContent='Ingresa usuario y contraseña'; loginErr.style.display='block'; return; }
+  const {data:found,error}=await supabaseClient.rpc('login_admin',{login_username:u,login_password:p});
+  if(error || !found){ loginErr.textContent='Credenciales incorrectas'; loginErr.style.display='block'; return; }
   currentUser=found;
-  localStorage.setItem(
-  'ison_session',
-  JSON.stringify(found)
-);
+  localStorage.setItem('ison_session',JSON.stringify(found));
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('sidebarUser').textContent=found.user;
@@ -622,8 +626,9 @@ async function doLogin(){
   catch(error){ console.error('No se pudieron cargar los datos:',error); showAdminToast('No se pudieron cargar los datos: '+error.message); }
   initDashboard();
 }
-function logout(){
+async function logout(){
 
+    if(currentUser?.token) await supabaseClient.rpc('logout_admin',{session_token:currentUser.token});
     localStorage.removeItem('ison_session');
 
     currentUser = null;
@@ -1075,7 +1080,10 @@ function saveConfig(){
 // ══════════════════════════════════════
 // USERS
 // ══════════════════════════════════════
-function renderUsers(){
+async function renderUsers(){
+  const {data,error}=await supabaseClient.rpc('list_admin_users',{session_token:currentUser.token});
+  if(error){ showAdminToast('No se pudieron cargar los usuarios'); return; }
+  users=data||[];
   document.getElementById('usersBody').innerHTML=users.map(u=>`
     <tr>
       <td>${u.user}</td>
@@ -1085,18 +1093,24 @@ function renderUsers(){
     </tr>
   `).join('');
 }
-function saveUser(){
+async function saveUser(){
   const user=document.getElementById('uUser').value.trim();
   const pass=document.getElementById('uPass').value.trim();
   if(!user||!pass){ showAdminToast('Completa todos los campos'); return; }
-  users.push({id:'u'+Date.now(),user,pass,rol:document.getElementById('uRol').value});
-  saveUsers(); document.getElementById('userModalBg').classList.remove('open'); renderUsers(); showAdminToast('Usuario creado');
+  const {error}=await supabaseClient.rpc('create_admin_user',{
+    session_token:currentUser.token,new_username:user,new_password:pass,new_role:document.getElementById('uRol').value
+  });
+  if(error){ showAdminToast(error.message.includes('duplicate')?'Ese usuario ya existe':'No se pudo crear el usuario'); return; }
+  document.getElementById('userModalBg').classList.remove('open');
+  document.getElementById('uUser').value=''; document.getElementById('uPass').value='';
+  await renderUsers(); showAdminToast('Usuario creado');
 }
-function deleteUser(id){
+async function deleteUser(id){
   if(users.find(u=>u.id===id)?.user===currentUser.user){ showAdminToast('No puedes eliminarte a ti mismo'); return; }
   if(!confirm('¿Eliminar usuario?')) return;
-  const i=users.findIndex(u=>u.id===id); if(i>=0) users.splice(i,1);
-  saveUsers(); renderUsers();
+  const {error}=await supabaseClient.rpc('delete_admin_user',{session_token:currentUser.token,user_id:id});
+  if(error){ showAdminToast('No se pudo eliminar el usuario'); return; }
+  await renderUsers(); showAdminToast('Usuario eliminado');
 }
 
 // ══════════════════════════════════════
