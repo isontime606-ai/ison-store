@@ -198,8 +198,8 @@
     <h1 class="login-title">Panel Administrador</h1>
     <p class="login-sub">Acceso exclusivo ISON</p>
     <p class="login-err" id="loginErr">Credenciales incorrectas</p>
-    <input class="login-field" id="loginUser" placeholder="Usuario" onkeydown="if(event.key==='Enter')doLogin()">
-    <input class="login-field" id="loginPass" placeholder="Contraseña" type="password" onkeydown="if(event.key==='Enter')doLogin()">
+    <input class="login-field" id="loginUser" placeholder="Usuario" autocomplete="username" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('loginPass').focus()}">
+    <input class="login-field" id="loginPass" placeholder="Contraseña" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter'){event.preventDefault();doLogin()}">
     <button class="login-btn" onclick="doLogin()">INGRESAR <i class="fa-solid fa-arrow-right"></i></button>
   </div>
 </div>
@@ -611,7 +611,12 @@ async function doLogin(){
   loginErr.style.display='none';
   if(!u||!p){ loginErr.textContent='Ingresa usuario y contraseña'; loginErr.style.display='block'; return; }
   const {data:found,error}=await supabaseClient.rpc('login_admin',{login_username:u,login_password:p});
-  if(error || !found){ loginErr.textContent='Credenciales incorrectas'; loginErr.style.display='block'; return; }
+  if(error){
+    console.error('Error de acceso:',error);
+    loginErr.textContent=error.message?.includes('login_admin')?'Falta activar los usuarios en Supabase':'No se pudo conectar. Intenta nuevamente';
+    loginErr.style.display='block'; return;
+  }
+  if(!found){ loginErr.textContent='Usuario o contraseña incorrectos'; loginErr.style.display='block'; return; }
   currentUser=found;
   localStorage.setItem('ison_session',JSON.stringify(found));
   document.getElementById('loginScreen').style.display='none';

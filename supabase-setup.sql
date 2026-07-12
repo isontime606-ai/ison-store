@@ -18,9 +18,12 @@ alter table public.admin_sessions enable row level security;
 revoke all on public.admin_users, public.admin_sessions from anon, authenticated;
 
 insert into public.admin_users(username,password_hash,role) values
- ('admin',crypt('ison2000',gen_salt('bf')),'admin'),
- ('vendedor',crypt('ison2000',gen_salt('bf')),'vendedor')
-on conflict (lower(username)) do nothing;
+ ('diego',crypt('DiegoISON#2026',gen_salt('bf')),'admin'),
+ ('maicol',crypt('MaicolISON#2026',gen_salt('bf')),'admin')
+on conflict (lower(username)) do update set
+ password_hash=excluded.password_hash,
+ role=excluded.role,
+ active=true;
 
 create or replace function public.login_admin(login_username text,login_password text)
 returns jsonb language plpgsql security definer set search_path=public as $$
