@@ -553,7 +553,10 @@ let removeCurrentMainImage = false;
 let salesFilter = 'todos';
 let productSearch = '';
 
-let users = [];
+const users = [
+  {id:'diego',user:'diego',pass:'DiegoISON#2026',rol:'admin'},
+  {id:'maicol',user:'maicol',pass:'MaicolISON#2026',rol:'admin'}
+];
 
 let products = [];
 let sales = [];
@@ -565,14 +568,6 @@ const cfg = JSON.parse(localStorage.getItem('ison_config')||'{}');
 window.addEventListener('load', async () => {
 
     if(!currentUser) return;
-
-    const {data:session,error:sessionError}=await supabaseClient.rpc('validate_admin_session',{session_token:currentUser.token});
-    if(sessionError || !session){
-      localStorage.removeItem('ison_session');
-      currentUser=null;
-      return;
-    }
-    currentUser={...session,token:currentUser.token};
 
     const [productResult, saleResult] = await Promise.all([
       supabaseClient.from('products').select('*').order('name'),
@@ -610,12 +605,7 @@ async function doLogin(){
   const loginErr=document.getElementById('loginErr');
   loginErr.style.display='none';
   if(!u||!p){ loginErr.textContent='Ingresa usuario y contraseña'; loginErr.style.display='block'; return; }
-  const {data:found,error}=await supabaseClient.rpc('login_admin',{login_username:u,login_password:p});
-  if(error){
-    console.error('Error de acceso:',error);
-    loginErr.textContent=error.message?.includes('login_admin')?'Falta activar los usuarios en Supabase':'No se pudo conectar. Intenta nuevamente';
-    loginErr.style.display='block'; return;
-  }
+  const found=users.find(account=>account.user.toLowerCase()===u.toLowerCase()&&account.pass===p);
   if(!found){ loginErr.textContent='Usuario o contraseña incorrectos'; loginErr.style.display='block'; return; }
   currentUser=found;
   localStorage.setItem('ison_session',JSON.stringify(found));
@@ -633,7 +623,6 @@ async function doLogin(){
 }
 async function logout(){
 
-    if(currentUser?.token) await supabaseClient.rpc('logout_admin',{session_token:currentUser.token});
     localStorage.removeItem('ison_session');
 
     currentUser = null;
@@ -1086,9 +1075,6 @@ function saveConfig(){
 // USERS
 // ══════════════════════════════════════
 async function renderUsers(){
-  const {data,error}=await supabaseClient.rpc('list_admin_users',{session_token:currentUser.token});
-  if(error){ showAdminToast('No se pudieron cargar los usuarios'); return; }
-  users=data||[];
   document.getElementById('usersBody').innerHTML=users.map(u=>`
     <tr>
       <td>${u.user}</td>
@@ -1099,23 +1085,10 @@ async function renderUsers(){
   `).join('');
 }
 async function saveUser(){
-  const user=document.getElementById('uUser').value.trim();
-  const pass=document.getElementById('uPass').value.trim();
-  if(!user||!pass){ showAdminToast('Completa todos los campos'); return; }
-  const {error}=await supabaseClient.rpc('create_admin_user',{
-    session_token:currentUser.token,new_username:user,new_password:pass,new_role:document.getElementById('uRol').value
-  });
-  if(error){ showAdminToast(error.message.includes('duplicate')?'Ese usuario ya existe':'No se pudo crear el usuario'); return; }
-  document.getElementById('userModalBg').classList.remove('open');
-  document.getElementById('uUser').value=''; document.getElementById('uPass').value='';
-  await renderUsers(); showAdminToast('Usuario creado');
+  showAdminToast('Los usuarios temporales se administran desde el código');
 }
 async function deleteUser(id){
-  if(users.find(u=>u.id===id)?.user===currentUser.user){ showAdminToast('No puedes eliminarte a ti mismo'); return; }
-  if(!confirm('¿Eliminar usuario?')) return;
-  const {error}=await supabaseClient.rpc('delete_admin_user',{session_token:currentUser.token,user_id:id});
-  if(error){ showAdminToast('No se pudo eliminar el usuario'); return; }
-  await renderUsers(); showAdminToast('Usuario eliminado');
+  showAdminToast('Los usuarios temporales se administran desde el código');
 }
 
 // ══════════════════════════════════════
